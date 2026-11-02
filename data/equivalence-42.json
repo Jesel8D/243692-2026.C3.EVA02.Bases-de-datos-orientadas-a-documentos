@@ -1,0 +1,1 @@
+{"checked":500000,"checked_logical_sha256":"3490c8c2b9a58f58ee69849dd55f00d556e64456168964d0cf74262e95cc7715","count_by_engine":{"mongo":500000,"postgres":500000},"mode":"full","sample_seed":null,"scope":"all IDs and complete logical content vs source","source_sha256":"9fecf656a02cf6d369517ae4d59f47072e4de4025ae9db6280611347fb557afb","status":"ok"}
