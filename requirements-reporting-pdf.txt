@@ -1,0 +1,4 @@
+-r requirements-reporting.txt
+# Optional; HTML is already printable without this dependency.
+reportlab==4.4.9
+charset-normalizer==3.5.2

@@ -1,0 +1,1 @@
+{"captured_at":"2026-11-01T18:08:41.310381+00:00","mode":"partial","plan":{"full_matrix":false,"matrix":"selection","scenarios":[{"concurrency":1,"engine":"postgres","profile":"severe","query":"Q2","run_number":1,"variant":"work_mem_4mb"}]},"q2_pairs":[],"scope":"pilot"}

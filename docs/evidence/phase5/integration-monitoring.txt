@@ -1,0 +1,9 @@
+test_real_scraping_native_pilot_and_resume (test_observability_integration.RealMonitoringTests.test_real_scraping_native_pilot_and_resume) ... postgres: verified=50/100
+postgres: verified=100/100
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 19.522s
+
+OK
+PASS real monitoring pilot and resume; new database/role retained: phase5pilot_09a82cb8b52d47a9a4ae60e5268d7ff6 phase5user_09a82cb8b52d47a9a4ae60e5268d7ff6

@@ -1,0 +1,17 @@
+test_real_scraping_native_pilot_and_resume (test_observability_integration.RealMonitoringTests.test_real_scraping_native_pilot_and_resume) ... postgres: verified=50/100
+postgres: verified=100/100
+FAIL
+
+======================================================================
+FAIL: test_real_scraping_native_pilot_and_resume (test_observability_integration.RealMonitoringTests.test_real_scraping_native_pilot_and_resume)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/tests/test_observability_integration.py", line 48, in test_real_scraping_native_pilot_and_resume
+    self.assertEqual(first.returncode,0,first.stdout+first.stderr+str(evidence.get('errors')))
+AssertionError: 1 != 0 : {"eligible_for_final_analysis":false,"experiment":"/tmp/phase5-real-pilot-hwpj_gkl/results/pilots/real-monitoring","samples":6952,"scenario_id":"ce02e3c45aeb8e6a95952cd3","status":"error"}
+['Prometheus local HTTP/JSON failure: HTTPError', 'Prometheus local HTTP/JSON failure: HTTPError']
+
+----------------------------------------------------------------------
+Ran 1 test in 11.979s
+
+FAILED (failures=1)

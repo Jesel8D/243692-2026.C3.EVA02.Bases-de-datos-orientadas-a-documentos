@@ -1,0 +1,53 @@
+{
+  "checked_at": "2026-11-01",
+  "sources": {
+    "prom": {
+      "release": "https://github.com/prometheus/prometheus/releases/tag/v3.15.1",
+      "image_repository": "prom/prometheus",
+      "registry_digest": "sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2",
+      "linux_amd64": {
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "digest": "sha256:d445d1806b38f85b5c394a1b87f94113fde0473b45245922c2e8b1bd41fa68ae",
+        "size": 2198,
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        }
+      }
+    },
+    "node": {
+      "release": "https://github.com/prometheus/node_exporter/releases/tag/v1.12.1",
+      "image_repository": "prom/node-exporter",
+      "registry_digest": "sha256:1b4e4438faca4dd7e001dd445d161a4a2091b0fededa84093b3a8dfeae1f1be0",
+      "linux_amd64": {
+        "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "digest": "sha256:da83fae85603c4e47e6c68369a7d746e2dda683dc35ea2e234b4f171e0d92798",
+        "size": 949,
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        }
+      }
+    },
+    "cadvisor": {
+      "release": "https://github.com/google/cadvisor/releases/tag/v0.60.6",
+      "image_repository": "ghcr.io/google/cadvisor",
+      "registry_digest": "sha256:b8e7d1093144fd088f425ff003d75a4aa405de075db78dae3bc563730b1bd07a",
+      "linux_amd64": {
+        "mediaType": "application/vnd.oci.image.manifest.v1+json",
+        "digest": "sha256:bd7c00644d65e6c9fc2c151cab70d2e86d7fe3e0182cfb9863120ec2e017cf01",
+        "size": 1810,
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        }
+      }
+    }
+  },
+  "cloud_runtime": {
+    "prometheus": "Official 3.15.1 linux-amd64 binary, not Compose container; image pull verified then only newly pulled Prometheus image removed after disk exhaustion",
+    "prometheus_release_sha256": "6a726885328ad9efebbf36e876ce2fb6225468a71fd1e7ce3ba666d5f4d97a84",
+    "cadvisor": "Pinned Docker image, cgroups host, no privileged flag/capabilities",
+    "node_exporter": "Pinned Docker image, host UTS/proc/sys/root read-only"
+  }
+}

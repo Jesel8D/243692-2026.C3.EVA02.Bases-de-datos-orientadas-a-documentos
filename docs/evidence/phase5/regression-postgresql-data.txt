@@ -1,0 +1,18 @@
+test_real_import_resume_and_readback (test_dataset_integration.RealDataIntegration.test_real_import_resume_and_readback) ... postgres: verified=17/100
+postgres: verified=34/100
+postgres: verified=51/100
+postgres: verified=68/100
+postgres: verified=85/100
+postgres: verified=100/100
+postgres: verified=29/100
+postgres: verified=58/100
+postgres: verified=87/100
+postgres: verified=100/100
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 7.767s
+
+OK
+Real integration database (retained): phase2test_8b3f9709bd824bbaaef9075114941e72
+REAL DATA INTEGRATION OK: postgres 4654466a1e399e3ed332a5d044b1b8478ef6dfe55509f8dbf1249fca66db0587

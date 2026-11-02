@@ -1,0 +1,17 @@
+test_real_scraping_native_pilot_and_resume (test_observability_integration.RealMonitoringTests.test_real_scraping_native_pilot_and_resume) ... FAIL
+
+======================================================================
+FAIL: test_real_scraping_native_pilot_and_resume (test_observability_integration.RealMonitoringTests.test_real_scraping_native_pilot_and_resume)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/tests/test_observability_integration.py", line 19, in test_real_scraping_native_pilot_and_resume
+    self.assertEqual(probe['status'],'PASS',probe.get('errors'))
+AssertionError: 'BLOCKED' != 'PASS'
+- BLOCKED
++ PASS
+ : ['Required metric unavailable: container_cpu_cfs_throttled_seconds_total; verify cAdvisor cgroups v2 support/permissions']
+
+----------------------------------------------------------------------
+Ran 1 test in 0.871s
+
+FAILED (failures=1)

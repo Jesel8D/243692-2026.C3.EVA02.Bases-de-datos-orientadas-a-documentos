@@ -1,0 +1,345 @@
+--- a/benchmark/cli.py
++++ b/benchmark/cli.py
+@@ -10,8 +10,9 @@
+ from .matrix import matrix
+ from .environment import helper,snapshot,cgroup_path,host_info,docker
+ from .telemetry import make_telemetry
+ from .preflight import preflight,driver_versions
++from .preflight_reuse import InvocationValidation
+ from .results import Store,experiment_lock,write_json,consolidate
+ from .runner import run_repetition
+ from .cache import manual_cache
+ 
+@@ -40,8 +41,9 @@
+     p.add_argument('--execute-selected',action='store_true')
+     p.add_argument('--confirm-matrix',action='store_true')
+     p.add_argument('--use-existing-services',action='store_true',help='pilot only; selected leaf limits must still match')
+     p.add_argument('--resume',action='store_true')
++    p.add_argument('--reuse-global-preflight',action='store_true',help='definitive only; one full check per invocation with guarded in-memory reuse; requires exclusive database writers')
+     p.add_argument('--inputs',type=Path,nargs='+',help='consolidate: experiment directories with sidecars')
+     p.add_argument('--allow-nonfinal',action='store_true',help='consolidate diagnostic pilot CSV only, never silently final')
+     return p
+ 
+@@ -63,8 +65,12 @@
+     if not re.fullmatch(r'[a-zA-Z0-9_-]+',a.experiment):raise QueryBlocked('Experiment name must be a simple slug')
+     if len(selected)>1 and not a.confirm_matrix:raise QueryBlocked('Multiple repetitions require --confirm-matrix explicitly')
+     if a.mode=='pilot' and len(selected)!=1:raise QueryBlocked('Pilot is exactly one scenario/repetition; select single mode')
+     if a.use_existing_services and a.mode!='pilot':raise QueryBlocked('--use-existing-services is pilot-only')
++    if a.reuse_global_preflight and a.mode!='definitive':raise QueryBlocked('Global preflight reuse is definitive-only')
++    if a.reuse_global_preflight and len(selected)<2:raise QueryBlocked('Global preflight reuse requires multiple scenarios in one invocation')
++    if a.reuse_global_preflight and os.environ.get('BENCHMARK_EXCLUSIVE_WRITERS_ACK')!='I_CONFIRM_NO_EXTERNAL_DB_WRITES':
++        raise QueryBlocked('Reuse requires BENCHMARK_EXCLUSIVE_WRITERS_ACK=I_CONFIRM_NO_EXTERNAL_DB_WRITES')
+     protocol=Protocol(a.mode,a.warmup,a.measurement,a.cooldown,a.timeout_ms,a.cache)
+     dataset=validate_file(a.file)
+     versions=driver_versions()
+     a.output.mkdir(parents=True,exist_ok=True)
+@@ -91,20 +97,24 @@
+             configuration={'runner_version':RUNNER_VERSION,'protocol':asdict(protocol),'selection':plan,'sources':source_hashes(),
+                 'dataset':{'sha256':dataset['sha256'],'count':dataset['count'],'configuration':dataset['configuration']},
+                 'identities':identities,'drivers':versions,'host':host_info(),'use_existing_services':a.use_existing_services,
+                 'evidence_kind':'real_native_driver','row_variant_mapping':'result.json + row SHA256; consolidation sidecar required',
+-                'monitoring_configuration':__import__('observability.config',fromlist=['settings']).settings()}
++                'monitoring_configuration':__import__('observability.config',fromlist=['settings']).settings(),
++                'global_preflight_policy':{'enabled':a.reuse_global_preflight,'scope':'single invocation only',
++                  'external_writer_exclusion_acknowledged':a.reuse_global_preflight,
++                  'limitations':'metadata/change counters do not constitute a cryptographic DB snapshot'}}
+             store=Store(destination,plain(configuration),resume=a.resume)
+             from datetime import datetime,timezone
+             write_json(destination/('invocation-'+uuid.uuid4().hex+'.json'),{'started_at_utc':datetime.now(timezone.utc).isoformat(),'resume':a.resume,'incomplete_attempts':store.incomplete,'incomplete_details':store.incomplete_details})
++            global_validation=InvocationValidation(a.file) if a.reuse_global_preflight else None
+             for s in selected:
+                 if s.id in store.finished:continue
+                 if cancel.is_set():raise InterruptedError('Cancelled before next repetition')
+                 if not a.use_existing_services:helper('activate',s.profile,s.engine)
+                 shot=snapshot(s.engine,s.profile)
+                 os.environ['DATA_MONGO_CONTAINER' if s.engine=='mongo' else 'DATA_PG_CONTAINER']=shot['id']
+                 telemetry=make_telemetry(cgroup_path(shot['pid']),context={'snapshot':shot,'scenario':s,'protocol':protocol})
+-                evidence,factory=preflight(s,protocol,a.file,a.output,shot,telemetry)
++                evidence,factory=preflight(s,protocol,a.file,a.output,shot,telemetry,global_validation=global_validation)
+                 if evidence['identity']!=identities[s.engine]:raise QueryBlocked('Engine identity changed; start a new experiment')
+                 if a.use_existing_services:evidence['deviations'].append('pilot: ancestors/other engine isolation not fully validated')
+                 else:helper('isolate',s.profile,s.engine)
+                 directory=store.begin(s)
+--- a/benchmark/preflight.py
++++ b/benchmark/preflight.py
+@@ -1,8 +1,8 @@
+ """Strict gates; pilot relaxations are visible deviations, not study validation."""
+ from dataclasses import asdict
+ from pathlib import Path
+-import importlib.metadata,os,shutil
++import importlib.metadata,os,shutil,time
+ from queries.definitions import QuerySpec,QueryBlocked
+ from queries.execution import QueryExecutor
+ from queries.indexes import inspect_indexes
+ from queries.validation import source_reference,validate_q1,validate_q2
+@@ -70,12 +70,14 @@
+                    'compatibility, index usage, or instructor approval'),
+     }
+ 
+ 
+-def preflight(scenario,protocol,dataset,output,resource_snapshot,telemetry):
++def preflight(scenario,protocol,dataset,output,resource_snapshot,telemetry,global_validation=None):
++    preflight_started=time.monotonic()
+     if not Path('/sys/fs/cgroup/cgroup.controllers').exists() or docker('info','--format','{{.CgroupVersion}}')!='2':raise QueryBlocked('cgroups v2 required')
+     if shutil.disk_usage(output).free<256*1024*1024:raise QueryBlocked('Less than 256 MiB free; no runner starts')
+-    stats=validate_file(dataset)
++    reuse = global_validation is not None and global_validation.ready and protocol.mode == 'definitive'
++    stats=global_validation.stats if reuse else validate_file(dataset)
+     strict=protocol.mode=='definitive'
+     deviations=[]
+     if strict and stats['count']!=500000:raise QueryBlocked('Definitive dataset count must be exactly 500000')
+     if not strict and stats['count']!=500000:deviations.append('small dataset, not definitive')
+@@ -99,17 +101,27 @@
+                                'operator acknowledgement for PostgreSQL text-index limitation')
+         if not strict and decision['status'] != 'PASS':
+             deviations.append('index conformity/interpretation pending; pilot only')
+     index_evidence = index_checks[scenario.engine]
+-    adapters=[QueryExecutor(e,protocol.timeout_ms).adapter for e in engines]
+-    data_evidence=compare_dataset(adapters,dataset)
+-    reference=source_reference((doc for _,_,doc in iter_file(dataset)),scenario.query)
++    shared_evidence = None
++    if reuse:
++        shared_evidence = global_validation.validate(protocol.timeout_ms)
++        data_evidence = global_validation.data_evidence
++        references = global_validation.references
++    else:
++        adapters=[QueryExecutor(e,protocol.timeout_ms).adapter for e in engines]
++        data_evidence=compare_dataset(adapters,dataset)
++        references={scenario.query:source_reference((doc for _,_,doc in iter_file(dataset)),scenario.query)}
++    reference=references[scenario.query]
+     check=(validate_q1 if scenario.query=='Q1' else validate_q2)(reference,result['rows'],scenario.engine)
+     if check['status']!='PASS':raise QueryBlocked('Selected query failed independent source oracle')
+-    if strict:
+-        # Check both original queries and every variant in both REAL engines, never old receipts alone.
++    if strict and not reuse:
++        # Full query and variant validation is performed ONCE per invocation.
++        # Every later scenario still executes and checks its selected query.
+         for query in ('Q1','Q2'):
+-            ref=source_reference((doc for _,_,doc in iter_file(dataset)),query)
++            if query not in references:
++                references[query] = source_reference((doc for _,_,doc in iter_file(dataset)),query)
++            ref=references[query]
+             from queries.definitions import VARIANTS
+             for e in engines:
+                 ex=QueryExecutor(e,protocol.timeout_ms)
+                 repeated_audit = inspect_indexes(ex)
+@@ -119,8 +131,12 @@
+                 for variant in VARIANTS[e][query]:
+                     answer=ex.execute(QuerySpec(e,query,variant,protocol.timeout_ms))
+                     c=(validate_q1 if query=='Q1' else validate_q2)(ref,answer['rows'],e)
+                     if c['status']!='PASS':raise QueryBlocked('Definitive real query/variant correctness failed')
++    # Capture proof only after full validation of both engines and every variant.
++    # Never persist this as a cross-process receipt or use it in pilot mode.
++    if strict and global_validation is not None and not reuse:
++        global_validation.save(stats,data_evidence,references,scenario.id,protocol.timeout_ms)
+     telemetry_check=telemetry.probe() if hasattr(telemetry,'probe') else {'status':'BLOCKED','errors':['Prometheus monitoring not configured']}
+     if strict and telemetry_check['status']!='PASS':raise QueryBlocked('Telemetry preflight BLOCKED: '+'; '.join(telemetry_check['errors']))
+     if not strict and telemetry_check['status']!='PASS':deviations.append('telemetry preflight incomplete; pilot only')
+     required=('cpu_throttled_seconds','max_rss_mb','disk_spill','oom_killed')
+@@ -151,9 +167,12 @@
+             'index_policy_by_engine':index_decisions,
+             'index_policy_scope':{'teacher_approval':'not_asserted',
+                                   'q2_text_index_cast_compatible':False,
+                                   'effective_interpretation':'operator-acknowledged physical-only when accepted'},
+-            'telemetry_preflight':telemetry_check,'telemetry_capabilities':telemetry.capabilities(),'deviations':deviations}, NativeFactory(conn,reference,identity['server_version'])
++            'telemetry_preflight':telemetry_check,'telemetry_capabilities':telemetry.capabilities(),'deviations':deviations,
++            'global_validation':shared_evidence or {'status':'FULL','scope':'all engines and variants freshly checked',
++                           'method':'no evidence reused'},
++            'preflight_elapsed_seconds':round(time.monotonic()-preflight_started,3)}, NativeFactory(conn,reference,identity['server_version'])
+ 
+ 
+ def driver_versions():
+     try:return {p:importlib.metadata.version(p) for p in ('psycopg','psycopg-binary','pymongo','dnspython','typing_extensions')}
+--- /dev/null
++++ b/benchmark/preflight_reuse.py
+@@ -0,0 +1,132 @@
++"""Per-invocation proof reuse. Never trust an old receipt or reuse across processes.
++
++Writer exclusion remains a methodological condition: the database endpoints must be
++reserved for the study, with no independent writer or DDL session. Change counters
++make ordinary writes observable; they cannot mathematically prove immutability.
++"""
++import hashlib
++import os
++from pathlib import Path
++
++from queries.definitions import QueryBlocked
++from src.dataset.model import parse_json
++
++
++def file_sha256(path):
++    h = hashlib.sha256()
++    with Path(path).open('rb') as f:
++        for block in iter(lambda: f.read(1024 * 1024), b''):
++            h.update(block)
++    return h.hexdigest()
++
++
++def file_fingerprint(path):
++    path = Path(path)
++    s = path.stat()
++    manifest = Path(str(path) + '.manifest.json')
++    return {'data_sha256': file_sha256(path),
++            'manifest_sha256': file_sha256(manifest),
++            'source_dev': s.st_dev, 'source_ino': s.st_ino,
++            'source_size': s.st_size, 'source_mtime_ns': s.st_mtime_ns,
++            'source_ctime_ns': s.st_ctime_ns}
++
++
++def database_write_guards(timeout_ms=120000):
++    """Read-only metadata and cumulative writes; fail closed if unavailable/reset."""
++    from queries.execution import QueryExecutor
++    from pymongo import MongoClient
++    # Includes the database OID, reset epoch, original table identity and DML
++    # counters. An empty or ambiguous response must not authorize reuse.
++    sql = '''
++SELECT row_to_json(x) FROM (
++ SELECT d.datid::text AS database_oid, d.stats_reset::text AS stats_reset,
++        d.tup_inserted, d.tup_updated, d.tup_deleted,
++        c.oid::text AS table_oid, c.relfilenode::text AS relfilenode,
++        (SELECT count(*) FROM public.orders) AS row_count
++ FROM pg_stat_database d, pg_class c
++ WHERE d.datname=current_database() AND c.oid='public.orders'::regclass
++) x;
++'''
++    rows = [parse_json(s) for s in QueryExecutor('postgres',timeout_ms).adapter.sql(sql).splitlines() if s.strip()]
++    if len(rows) != 1 or rows[0].get('row_count') != 500000:
++        raise QueryBlocked('Global validation cache: PostgreSQL revision/count unavailable or changed')
++    user = os.environ.get('MONGO_USERNAME')
++    pwd = os.environ.get('MONGO_PASSWORD')
++    name = os.environ.get('DATA_DATABASE_NAME')
++    if not user or not pwd or not name:
++        raise QueryBlocked('Global validation cache: Mongo credentials/database unavailable')
++    with MongoClient(host='127.0.0.1',port=27017,username=user,password=pwd,
++                     authSource='admin',serverSelectionTimeoutMS=5000,
++                     retryReads=False,retryWrites=False) as client:
++        db = client[name]
++        status = client.admin.command('serverStatus')
++        operations = status.get('opcounters',{})
++        inventory = list(db.list_collections(filter={'name':'orders'}))
++        if len(inventory)!=1:
++            raise QueryBlocked('Global validation cache: Mongo collection identity unavailable')
++        count = db.orders.estimated_document_count()
++        if count != 500000:
++            raise QueryBlocked('Global validation cache: MongoDB document count changed')
++        uuid = inventory[0].get('info',{}).get('uuid')
++        if uuid is None or not all(k in operations for k in ('insert','update','delete')):
++            raise QueryBlocked('Global validation cache: MongoDB write/identity counters unavailable')
++        mongo = {'collection_uuid': str(uuid), 'count': count,
++                 'insert': int(operations['insert']),
++                 'update': int(operations['update']),
++                 'delete': int(operations['delete'])}
++    return {'postgres': rows[0], 'mongo': mongo}
++
++
++class InvocationValidation:
++    """Never persisted; first full proof belongs to this one CLI invocation only."""
++    def __init__(self, dataset):
++        self.dataset = str(Path(dataset).resolve())
++        self.ready = False
++        self.stats = None
++        self.data_evidence = None
++        self.references = {}
++        self.revision = None
++        self.source = None
++        self.original_scenario_id = None
++
++    def check_source(self):
++        source = file_fingerprint(self.dataset)
++        if self.ready and source != self.source:
++            raise QueryBlocked('Global preflight reuse blocked: source/manifest changed')
++        return source
++
++    def check_revision(self, timeout_ms):
++        current = database_write_guards(timeout_ms)
++        if self.ready and current != self.revision:
++            raise QueryBlocked('Global preflight reuse blocked: DB write counters/identity/count changed')
++        return current
++
++    def save(self, stats, data_evidence, references, scenario_id, timeout_ms):
++        if self.ready:
++            raise QueryBlocked('Global preflight must not be overwritten')
++        if data_evidence.get('status') != 'ok' or data_evidence.get('mode') != 'full' or data_evidence.get('checked') != 500000:
++            raise QueryBlocked('Only verified full comparison qualifies for global reuse')
++        if not {'Q1','Q2'} <= set(references):
++            raise QueryBlocked('Both source references required for global reuse')
++        source = self.check_source()
++        if source['data_sha256'] != stats['sha256']:
++            raise QueryBlocked('Global preflight: source hash differs from verified file')
++        revision = self.check_revision(timeout_ms)
++        self.stats = stats
++        self.data_evidence = data_evidence
++        self.references = references
++        self.source = source
++        self.revision = revision
++        self.original_scenario_id = scenario_id
++        self.ready = True
++
++    def validate(self, timeout_ms):
++        if not self.ready:
++            raise QueryBlocked('No current invocation full preflight proof')
++        self.check_source()
++        self.check_revision(timeout_ms)
++        return {'status':'PASS','method':'same-process full-preflight evidence reuse',
++                'original_scenario_id':self.original_scenario_id,
++                'source_sha256':self.source['data_sha256'],
++                'change_guard':'source+manifest SHA256, Mongo collection UUID/count/opcounters, PostgreSQL table OID/relfilenode/count/DML statistics',
++                'limitations':'requires exclusive/no-external-writers; counters cannot prove immutability against DDL or all privileged changes'}
+--- /dev/null
++++ b/tests/test_preflight_reuse.py
+@@ -0,0 +1,55 @@
++"""Offline guard tests. No DB connections or benchmark execution."""
++import tempfile
++from pathlib import Path
++from unittest import TestCase
++from unittest.mock import patch
++
++from queries.definitions import QueryBlocked
++from benchmark.preflight_reuse import InvocationValidation, file_fingerprint
++
++
++class ReuseProofTests(TestCase):
++    def setUp(self):
++        self.tmp = tempfile.TemporaryDirectory()
++        self.addCleanup(self.tmp.cleanup)
++        self.file = Path(self.tmp.name) / 'orders.jsonl'
++        self.file.write_text('{"order_id":"demo"}\n')
++        Path(str(self.file) + '.manifest.json').write_text('{}')
++        self.stats = {'sha256':file_fingerprint(self.file)['data_sha256']}
++        self.evidence = {'status':'ok', 'mode':'full', 'checked':500000}
++        self.refs = {'Q1':object(), 'Q2':object()}
++        self.db_rev = {'mongo':{'count':500000,'insert':7}, 'postgres':{'row_count':500000, 'tup_inserted':10}}
++
++    def test_full_current_invocation_proof_can_be_reused(self):
++        with patch('benchmark.preflight_reuse.database_write_guards',return_value=self.db_rev):
++            proof=InvocationValidation(self.file)
++            proof.save(self.stats,self.evidence,self.refs,'scenario-1',120000)
++            self.assertEqual(proof.validate(120000)['status'],'PASS')
++            self.assertEqual(proof.original_scenario_id,'scenario-1')
++            with self.assertRaises(QueryBlocked):proof.save(self.stats,self.evidence,self.refs,'scenario-2',120000)
++
++    def test_changed_source_or_manifest_fails_closed(self):
++        with patch('benchmark.preflight_reuse.database_write_guards',return_value=self.db_rev):
++            proof=InvocationValidation(self.file)
++            proof.save(self.stats,self.evidence,self.refs,'scenario-1',120000)
++            Path(str(self.file)+'.manifest.json').write_text('{"changed":1}')
++            with self.assertRaises(QueryBlocked):proof.validate(120000)
++
++    def test_changed_write_counters_fails_closed(self):
++        with patch('benchmark.preflight_reuse.database_write_guards',side_effect=[self.db_rev,{'mongo':{'count':500000,'insert':8},'postgres':{'row_count':500000,'tup_inserted':10}}]):
++            proof=InvocationValidation(self.file)
++            proof.save(self.stats,self.evidence,self.refs,'scenario-1',120000)
++            with self.assertRaises(QueryBlocked):proof.validate(120000)
++
++    def test_incomplete_or_missing_proof_refused(self):
++        proof=InvocationValidation(self.file)
++        with self.assertRaises(QueryBlocked):proof.validate(120000)
++        with self.assertRaises(QueryBlocked):proof.save(self.stats,{'status':'ok','mode':'sample','checked':500000},self.refs,'s',120000)
++        with self.assertRaises(QueryBlocked):proof.save(self.stats,self.evidence,{'Q1':object()},'s',120000)
++
++    def test_source_replaced_content_same_size_but_new_hash_is_rejected(self):
++        with patch('benchmark.preflight_reuse.database_write_guards',return_value=self.db_rev):
++            proof=InvocationValidation(self.file)
++            proof.save(self.stats,self.evidence,self.refs,'scenario-1',120000)
++            self.file.write_text('{"order_id":"xemo"}\n')
++            with self.assertRaises(QueryBlocked):proof.validate(120000)

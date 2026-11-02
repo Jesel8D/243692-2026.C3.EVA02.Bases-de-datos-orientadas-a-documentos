@@ -1,0 +1,152 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage[margin=2.4cm,headheight=15pt]{geometry}
+\usepackage{lmodern,microtype,amsmath}
+\usepackage{graphicx,booktabs,longtable,tabularx,array}
+\usepackage{xcolor,listings,fancyhdr}
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+\urlstyle{same}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.35em}
+\setlength{\emergencystretch}{4em}
+\renewcommand{\arraystretch}{1.12}
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{2}
+\input{informe-activo.tex}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small MongoDB y PostgreSQL JSONB}
+\fancyhead[R]{\small Informe parcial}
+\fancyfoot[C]{\thepage}
+\hypersetup{
+ pdftitle={MongoDB y PostgreSQL JSONB: informe académico parcial},
+ pdfauthor={Jesel Moreno Zuniga}
+}
+\newcommand{\pendiente}[1]{%
+ \par\smallskip\noindent
+ \fbox{\parbox{0.94\linewidth}{\small\textbf{Pendiente:} #1}}
+ \par\smallskip}
+\lstset{
+ basicstyle=\ttfamily\scriptsize,
+ breaklines=true,columns=fullflexible,keepspaces=true,
+ showstringspaces=false,frame=single,
+ aboveskip=0.6em,belowskip=0.6em
+}
+\newcommand{\reportfigure}[3]{%
+ \IfFileExists{\artifactdir/#1}{%
+ \begin{figure}[!htbp]\centering
+ \includegraphics[width=0.92\linewidth]{\artifactdir/#1}
+ \caption{#2}\label{#3}\end{figure}
+ }{\pendiente{Figura no generada. #2}}}
+\begin{document}
+\begin{titlepage}\centering
+{\Large Universidad Politécnica de Chiapas\par}
+\vspace{0.6cm}
+{\large Licenciatura en Ingeniería en Tecnologías de la Información
+e Innovación Digital\par}
+\vspace{0.7cm}
+{\large Base de datos en la nube\par}
+\vspace{0.9cm}
+{\LARGE\bfseries Análisis comparativo del rendimiento de MongoDB
+y PostgreSQL JSONB bajo restricciones de CPU y memoria
+en agregaciones de documentos JSON anidados\par}
+\vspace{0.7cm}
+{\Large Informe académico parcial\par}
+\vspace{0.7cm}
+\begin{tabularx}{0.92\linewidth}{rX}
+Estudiante: & Jesel Moreno Zuniga\\
+Grupo: & 7B\\
+Profesor: & Horacio Irán Solís Cisneros\\
+Actividad: & 2026.C3.EVA02
+\end{tabularx}
+\vfill
+{1 de noviembre de 2026\par}
+\smallskip
+\begin{minipage}{0.91\linewidth}\small
+La matriz prevista comprende 108 ejecuciones. El responsable confirma
+dos mediciones definitivas elegibles. El documento distingue la evidencia
+cotejada localmente, la información comunicada y los pendientes.
+\end{minipage}
+\end{titlepage}
+
+\section*{Resumen}
+Se estudia el comportamiento de MongoDB y PostgreSQL JSONB en
+agregaciones sobre 500\,000 documentos JSON anidados. El diseño incluye
+tres perfiles de CPU y memoria, dos consultas, tres concurrencias y
+tres repeticiones, para 108 ejecuciones previstas en la matriz base.
+El protocolo establece calentamiento de 60 segundos, medición de
+300 segundos y enfriamiento de 60 segundos.
+
+El responsable confirma dos mediciones definitivas elegibles para Q1,
+perfil A, concurrencia 1 y repetición 1. Las tablas documentan su cotejo
+contra CSV y archivos de commit existentes. Se registran throughput,
+percentiles, CPU throttling, RSS máximo, spill y estado de ejecución,
+sin completar datos ausentes con cero.
+
+El alcance es descriptivo: una observación por motor no permite inferir
+variación entre repeticiones, efectos de concurrencia o superioridad
+general. Se conserva la limitación del índice textual de PostgreSQL
+frente al cast temporal de Q2. También se documenta que la reutilización
+del preflight se bloqueó al cambiar de motor, sin atribuir un ahorro
+de tiempo no demostrado.
+
+\textbf{Palabras clave:} MongoDB, JSONB, agregaciones, cgroups v2,
+latencia, RSS, throttling, reproducibilidad.
+\tableofcontents
+\clearpage
+
+\section*{Introducción y justificación}
+\addcontentsline{toc}{section}{Introducción y justificación}
+El soporte JSON en sistemas relacionales y las bases orientadas a
+documentos permiten formular agregaciones sobre estructuras similares.
+Sin embargo, la equivalencia funcional no implica igualdad de planes,
+representación física o administración de memoria. Una comparación
+defendible requiere conservar la fuente de datos, la semántica y las
+condiciones que explican cada observación.
+
+Este trabajo examina dos cargas: desanidado y agrupamiento de ítems,
+y filtrado temporal con ordenamiento y Top-K. La restricción explícita
+de CPU y memoria permite plantear preguntas sobre capacidad, latencia
+y trabajo temporal, sin asumir que una sola cifra representa todo el
+comportamiento de un motor.
+
+La entrega es parcial. Las operaciones ejecutadas dentro de una ventana
+no son repeticiones independientes del escenario. Los pilotos previos,
+las mediciones definitivas y los escenarios pendientes deben mantenerse
+separados. Se distinguen hechos comunicados por el responsable,
+archivos examinados durante la generación y limitaciones pendientes.
+
+\textbf{Objetivo general.} Comparar MongoDB y PostgreSQL JSONB mediante
+agregaciones sobre 500\,000 documentos anidados bajo cuotas de CPU y
+memoria controladas.
+
+\textbf{Objetivos específicos.} Verificar equivalencia de datos;
+conservar consultas originales; medir rendimiento y señales de recursos;
+describir índices y planes existentes; y delimitar el alcance de las
+conclusiones de una matriz incompleta.
+
+\input{\artifactdir/01-entorno.tex}
+\input{\artifactdir/02-metodologia.tex}
+\input{\artifactdir/03-resultados.tex}
+\input{\artifactdir/04-graficas.tex}
+\input{\artifactdir/05-planes.tex}
+\input{\artifactdir/06-interpretacion.tex}
+\input{\artifactdir/07-recomendaciones.tex}
+\input{\artifactdir/08-conclusiones.tex}
+\clearpage
+\addcontentsline{toc}{section}{Referencias}
+\begin{thebibliography}{9}
+\bibitem{pgmemory} PostgreSQL Global Development Group. \textit{PostgreSQL 18: Resource Consumption}. \url{https://www.postgresql.org/docs/18/runtime-config-resource.html}.
+\bibitem{pgexplain} PostgreSQL Global Development Group. \textit{PostgreSQL 18: Using EXPLAIN}. \url{https://www.postgresql.org/docs/18/using-explain.html}.
+\bibitem{pgindex} PostgreSQL Global Development Group. \textit{PostgreSQL 18: Indexes on Expressions}. \url{https://www.postgresql.org/docs/18/indexes-expressional.html}.
+\bibitem{wiredtiger} MongoDB. \textit{WiredTiger Storage Engine}. \url{https://www.mongodb.com/docs/manual/core/wiredtiger/}.
+\bibitem{mongolimits} MongoDB. \textit{Aggregation Pipeline Limits}. \url{https://www.mongodb.com/docs/manual/core/aggregation-pipeline-limits/}.
+\bibitem{docker} Docker. \textit{Resource constraints}. \url{https://docs.docker.com/engine/containers/resource_constraints/}.
+\bibitem{kernel} The Linux Kernel documentation. \textit{Control Group v2}. \url{https://docs.kernel.org/admin-guide/cgroup-v2.html}.
+\end{thebibliography}
+\appendix
+\input{\artifactdir/09-anexos.tex}
+\end{document}

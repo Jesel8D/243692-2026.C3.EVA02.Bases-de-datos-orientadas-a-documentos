@@ -1,0 +1,38 @@
+test_bad_header_is_quarantined_not_repaired (test_reporting.ReportingTests.test_bad_header_is_quarantined_not_repaired) ... ok
+test_charts_are_png_and_source_hashes_unchanged (test_reporting.ReportingTests.test_charts_are_png_and_source_hashes_unchanged) ... ok
+test_cohorts_separate_changed_dataset (test_reporting.ReportingTests.test_cohorts_separate_changed_dataset) ... ok
+test_complete_final_gate_requires_all_108_and_linked_plans (test_reporting.ReportingTests.test_complete_final_gate_requires_all_108_and_linked_plans) ... ok
+test_decimal_statistics_and_percentage_zero (test_reporting.ReportingTests.test_decimal_statistics_and_percentage_zero) ... ok
+test_duplicate_experiment_and_duplicate_repetition_rejected (test_reporting.ReportingTests.test_duplicate_experiment_and_duplicate_repetition_rejected) ... ok
+test_effective_variant_and_qps_are_independently_checked (test_reporting.ReportingTests.test_effective_variant_and_qps_are_independently_checked) ... ok
+test_extended_approval_is_not_inferred (test_reporting.ReportingTests.test_extended_approval_is_not_inferred) ... ok
+test_failed_and_missing_values_excluded_from_means (test_reporting.ReportingTests.test_failed_and_missing_values_excluded_from_means) ... ok
+test_final_incomplete_blocks_or_explicit_partial (test_reporting.ReportingTests.test_final_incomplete_blocks_or_explicit_partial) ... ok
+test_matrix_108_162_and_13h_budget (test_reporting.ReportingTests.test_matrix_108_162_and_13h_budget) ... ok
+test_missing_committed_file_quarantines (test_reporting.ReportingTests.test_missing_committed_file_quarantines) ... ok
+test_new_commit_is_seen_without_runner_lock (test_reporting.ReportingTests.test_new_commit_is_seen_without_runner_lock) ... ok
+test_official_csv_and_variant_sidecar (test_reporting.ReportingTests.test_official_csv_and_variant_sidecar) ... ok
+test_output_cannot_be_inside_experiment (test_reporting.ReportingTests.test_output_cannot_be_inside_experiment) ... ok
+test_partial_repetitions_have_descriptive_stats_not_comparison (test_reporting.ReportingTests.test_partial_repetitions_have_descriptive_stats_not_comparison) ... ok
+test_plans_are_diagnostic_and_never_execute_db (test_reporting.ReportingTests.test_plans_are_diagnostic_and_never_execute_db) ... ok
+test_progress_watch_reads_real_pilot_without_writes (test_reporting.ReportingTests.test_progress_watch_reads_real_pilot_without_writes) ... ok
+test_public_cli_cannot_publish_fixture_report (test_reporting.ReportingTests.test_public_cli_cannot_publish_fixture_report) ... ok
+test_public_loader_rejects_synthetic_fixtures (test_reporting.ReportingTests.test_public_loader_rejects_synthetic_fixtures) ... ok
+test_q2_pairs_explicit_and_complete_triplicate (test_reporting.ReportingTests.test_q2_pairs_explicit_and_complete_triplicate) ... ok
+test_raw_journal_corruption_detected_by_full_audit (test_reporting.ReportingTests.test_raw_journal_corruption_detected_by_full_audit) ... ok
+test_relative_paths_work_outside_repository (test_reporting.ReportingTests.test_relative_paths_work_outside_repository) ... ok
+test_resolved_incomplete_attempt_not_counted_twice (test_reporting.ReportingTests.test_resolved_incomplete_attempt_not_counted_twice) ... ok
+test_rss_gap_inserts_nan_and_no_missing_client_line (test_reporting.ReportingTests.test_rss_gap_inserts_nan_and_no_missing_client_line) ... ok
+test_rss_is_not_fabricated_from_maximum (test_reporting.ReportingTests.test_rss_is_not_fabricated_from_maximum) ... ok
+test_scope_separates_pilot_and_definitive (test_reporting.ReportingTests.test_scope_separates_pilot_and_definitive) ... ok
+test_seven_sections_escaping_and_missing_personal_data (test_reporting.ReportingTests.test_seven_sections_escaping_and_missing_personal_data) ... ok
+test_snapshot_source_bytes_and_previous_reports_preserved (test_reporting.ReportingTests.test_snapshot_source_bytes_and_previous_reports_preserved) ... ok
+test_standalone_csv_schema_cli_does_not_certify_results (test_reporting.ReportingTests.test_standalone_csv_schema_cli_does_not_certify_results) ... ok
+test_uncommitted_partial_csv_is_pending (test_reporting.ReportingTests.test_uncommitted_partial_csv_is_pending) ... ok
+test_explain_optional_file_reuses_full_source_verifier (test_reporting_plan_binding.PlanBindingTests.test_explain_optional_file_reuses_full_source_verifier) ... ok
+test_source_mismatch_blocks_before_diagnostic_execution (test_reporting_plan_binding.PlanBindingTests.test_source_mismatch_blocks_before_diagnostic_execution) ... ok
+
+----------------------------------------------------------------------
+Ran 33 tests in 3.546s
+
+OK

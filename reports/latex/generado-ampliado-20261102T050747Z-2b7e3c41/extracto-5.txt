@@ -1,0 +1,9 @@
+21: 
+22: Entrada preferida: directorio de experimento con experiment.json y subdirectorios escenario/attempt-UUID/commit.json, results.csv, result.json, started.json, preflight.json y evidencia. Tambi\xe9n se acepta ruta a results.csv si se encuentra su experimento completo entre sus padres. Un directorio padre inmediato puede contener varios experimentos. No se asume ruta fija. Un CSV consolidado sin configuraci\xf3n experimental no basta para inferir dataset/protocolo/variante: usar los experimentos originales; --csv solo comprueba esquema.
+23: 
+49: | --- | --- | --- |
+50: | Base 108 | 12h36 | Solo 24min para TODA preparaci\xf3n, verificaci\xf3n, cach\xe9, drenaje y reporte |
+51: | Extendida 162 | 18h54 | Excede 13h incluso sin sobrecostes; adem\xe1s no aprobada |
+52: 
+53: Preparaci\xf3n/importaci\xf3n y preflight completo pueden hacer inviable terminar la base en 13h. **No se acortan warmup/medici\xf3n/cooldown ni se redefine la matriz para ocultarlo.** Si falta tiempo, entregar parcial con cobertura y limitaciones reales. La herramienta puede analizar desde otro equipo; en el mismo host sus lecturas/CPU/figuras agregan carga fuera del camino de consultas. Ejecutar despu\xe9s de bloques o en otro equipo para evitar contaminaci\xf3n adicional; no se promete impacto cero solo por ser readonly.
+54: 

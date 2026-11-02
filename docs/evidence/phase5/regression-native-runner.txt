@@ -1,0 +1,9 @@
+test_native_sessions_failures_pilot_csv_and_resume (test_benchmark_integration.NativePilotTests.test_native_sessions_failures_pilot_csv_and_resume) ... postgres: verified=50/100
+postgres: verified=100/100
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 7.391s
+
+OK
+Real native PG pilot verified; reduced window, missing telemetry, not final. Database/role retained: phase4pilot_441dca778b064a20a5b4449ae7879260

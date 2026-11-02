@@ -1,0 +1,112 @@
+{
+  "cache": {
+    "deviation": "not equivalent to manual cache flush",
+    "policy": "skip"
+  },
+  "clients_connected": 1,
+  "clients_effective": {
+    "0": {
+      "backend_pid": 238,
+      "prepare_threshold": null,
+      "server_version": "18.6 (Debian 18.6-1.pgdg12+2)",
+      "work_mem": "4MB"
+    }
+  },
+  "clients_requested": 1,
+  "container_end_state": {
+    "exit_code": 0,
+    "oom_killed": false,
+    "running": true
+  },
+  "csv_row_sha256": "935280d034c69676b24bdaf69f61266be9c4f1145572ef95ecf48fd986787792",
+  "deviations": [
+    "small dataset, not definitive",
+    "index conformity pending; pilot only",
+    "mandatory telemetry absent: cpu_throttled_seconds,max_rss_mb,disk_spill,oom_killed",
+    "cache flush skipped, not protocol-equivalent",
+    "pilot: ancestors/other engine isolation not fully validated"
+  ],
+  "eligible_for_final_analysis": false,
+  "errors": [],
+  "evidence_kind": "real_native_driver",
+  "experiment_id": "ebef92fa4efc4820953bd157cfdacc8a",
+  "metrics": {
+    "errors": 0,
+    "excluded_boundary": 1,
+    "latency_p50_ms": 0.709675,
+    "latency_p95_ms": 1.16717665,
+    "latency_p99_ms": 1.95000946,
+    "samples": 318,
+    "successful_inside": 318,
+    "throughput_qps": 1272,
+    "warmup": 62
+  },
+  "missing_telemetry": [
+    "cpu_throttled_seconds",
+    "max_rss_mb",
+    "disk_spill",
+    "oom_killed"
+  ],
+  "protocol": {
+    "cache": "skip",
+    "cooldown": 0.05,
+    "measurement": 0.25,
+    "mode": "pilot",
+    "timeout_ms": 2000,
+    "warmup": 0.05
+  },
+  "purpose": "REAL PILOT ONLY: reduced durations, cache skipped, missing mandatory telemetry; NOT academic performance results",
+  "runner_resources": {
+    "process_lifetime_maxrss_kib": 34316,
+    "scope": "runner process, not database RSS; whole attempt CPU",
+    "system_cpu_seconds": 0.024852000000000006,
+    "user_cpu_seconds": 0.13105999999999998
+  },
+  "scenario": {
+    "concurrency": 1,
+    "engine": "postgres",
+    "profile": "severe",
+    "query": "Q1",
+    "run_number": 1,
+    "variant": "default"
+  },
+  "scenario_id": "7248c5e19ed791833e464042",
+  "source_csv_sha256": "42cf70296e02d46b17cf481b900a9c5e1cfa591cf2edb050afcc8a88d98f817e",
+  "stages": [
+    {
+      "end_ns": 1775558565164,
+      "stage": "warmup",
+      "start_ns": 1775508565164
+    },
+    {
+      "at_ns": 1775565771431,
+      "stage": "warmup_drained"
+    },
+    {
+      "end_ns": 1775835780659,
+      "stage": "measurement",
+      "start_ns": 1775585780659,
+      "timestamp_epoch": "1793533576.585665329"
+    },
+    {
+      "at_ns": 1775846128696,
+      "stage": "measurement_drained"
+    },
+    {
+      "end_ns": 1775896183788,
+      "stage": "cooldown",
+      "start_ns": 1775846183788
+    }
+  ],
+  "status": "error",
+  "telemetry": {
+    "cpu_throttled_seconds": null,
+    "disk_spill": null,
+    "max_rss_mb": null,
+    "oom_killed": null,
+    "reason": "No direct cgroup path/read permission"
+  },
+  "timestamp_scope": "measurement boundary",
+  "variant": "default",
+  "window_complete": true
+}

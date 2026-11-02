@@ -1,0 +1,35 @@
+\section{Recomendaciones para la nube}
+Son criterios generales, no selección validada de proveedor o instancia.
+\subsection{Dimensionamiento}
+CPU y memoria deben contrastarse con throughput requerido, latencia,
+estados y margen. Cuotas locales no equivalen automáticamente a vCPU
+dedicadas, créditos o almacenamiento remoto.
+
+RSS individual no define un mínimo seguro. No se recomienda reducir
+memoria hasta el máximo observado ni aumentar CPU solo por throttling.
+Deben contemplarse concurrencia, cachés y trabajo temporal.
+
+\subsection{Concurrencia y escalabilidad}
+Más clientes podrían aumentar colas sin mejorar QPS, pero no está
+demostrado aquí. C10/C50 no reciben recomendaciones cuantitativas.
+
+Escalar horizontalmente introduce coordinación, red y consistencia.
+Los beneficios no se deducen de un contenedor local por motor.
+
+\subsection{Selección del motor}
+Q1 no representa toda la aplicación. Importan transacciones, escrituras,
+modelo de datos, índices y operación. Dos observaciones no establecen
+un ganador general. Q2 requiere evaluación y exposición de la limitación
+del índice textual.
+
+\subsection{Memoria y almacenamiento}
+La memoria por operación debe revisarse con sesiones, límite del
+contenedor y almacenamiento temporal. Aumentar parámetros puede trasladar
+presión desde disco a memoria. Spill no implica automáticamente fallo;
+su ausencia tampoco garantiza una ejecución óptima.
+
+\subsection{Observabilidad}
+Deben conservarse identificadores, commit, consultas, variantes, límites
+y cobertura. Los paneles deben distinguir ausencia de datos y cero.
+La reutilización del preflight requiere contexto compatible; su bloqueo
+no permite afirmar ahorro demostrado.

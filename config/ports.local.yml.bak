@@ -1,0 +1,8 @@
+# Development only. Set PUBLISH_PORTS=true in .env to load this override.
+services:
+  mongodb:
+    ports:
+      - "127.0.0.1:${MONGO_PORT:-27017}:27017"
+  postgres:
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"

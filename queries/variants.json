@@ -1,0 +1,16 @@
+{
+  "mongo": {
+    "Q1": {"default": {}},
+    "Q2": {
+      "allow_disk_false": {"allowDiskUse": false},
+      "allow_disk_true": {"allowDiskUse": true}
+    }
+  },
+  "postgres": {
+    "Q1": {"default": {}},
+    "Q2": {
+      "work_mem_4mb": {"work_mem": "4MB"},
+      "work_mem_64mb": {"work_mem": "64MB"}
+    }
+  }
+}

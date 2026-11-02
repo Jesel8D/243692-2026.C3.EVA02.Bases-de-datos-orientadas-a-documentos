@@ -1,0 +1,65 @@
+\section{Especificaciones del host, Docker y observabilidad}
+\subsection{Equipo y sistema operativo}
+\input{\artifactdir/host.tex}
+La captura corresponde al momento de generación del informe. Aunque
+se realice en el equipo experimental, no demuestra la frecuencia,
+disponibilidad de memoria o carga exacta durante las mediciones.
+Las CPU lógicas visibles no deben confundirse con núcleos físicos.
+
+El entorno comunicado utiliza Kubuntu nativo, Docker Engine y Compose,
+con cgroups v2. Las versiones comunicadas son MongoDB 9.0.4 y
+PostgreSQL 18.6. Una etiqueta de imagen, una versión de biblioteca y la
+versión del servidor son evidencias diferentes. Debe cotejarse esa
+correspondencia con los artefactos de la cohorte.
+
+\subsection{Arquitectura y servicios}
+\input{\artifactdir/compose.tex}
+Los servicios e imágenes se extraen de archivos Compose existentes.
+Son configuración declarada, no comprobación de salud, persistencia
+o límites efectivos. El generador no invoca Docker.
+
+El esquema describe responsabilidades conceptuales y no una topología
+de red inferida.
+\begin{center}
+\begin{tabular}{c}
+\fbox{\parbox{0.79\linewidth}{\centering JSONL, manifiesto y equivalencia}}\\[0.2cm]
+$\downarrow$\\[0.1cm]
+\fbox{\parbox{0.79\linewidth}{\centering Runner: consulta, perfil, concurrencia y ventanas}}\\[0.2cm]
+$\downarrow$\\[0.1cm]
+\fbox{\parbox{0.34\linewidth}{\centering MongoDB}}\quad
+\fbox{\parbox{0.34\linewidth}{\centering PostgreSQL JSONB}}\\[0.2cm]
+$\downarrow$\\[0.1cm]
+\fbox{\parbox{0.79\linewidth}{\centering CSV, telemetría, preflight y commit}}
+\end{tabular}
+\end{center}
+
+\subsection{Perfiles de recursos}
+\begin{table}[!htbp]\centering
+\caption{Perfiles oficiales comunicados.}\label{tab:perfiles}
+\begin{tabular}{lrr}\toprule
+Perfil & CPU & Memoria (MiB)\\\midrule
+\texttt{PROFILE\_A\_BASELINE} & 4 & 4096\\
+\texttt{PROFILE\_B\_MEDIUM} & 2 & 2048\\
+\texttt{PROFILE\_C\_SEVERE} & 1 & 1024\\
+\bottomrule\end{tabular}
+\end{table}
+Docker y cgroups permiten imponer restricciones \cite{docker,kernel}.
+Una cuota equivalente a cuatro CPU no acredita reserva de cuatro
+núcleos ni exclusividad. La presencia de cgroups v2 tampoco sustituye
+los límites efectivos del cgroup de cada motor.
+
+El límite de memoria no es RSS máximo. La ausencia de swap no equivale
+automáticamente al cumplimiento literal de otra opción de swappiness;
+las adaptaciones requieren registro.
+
+\subsection{Observabilidad y unidades}
+La arquitectura comunicada utiliza Prometheus, cAdvisor y Node Exporter.
+La interpretación exige identificar contenedor, etiquetas, intervalo y
+ventana. Una serie vacía no equivale a cero. Los contadores requieren
+deltas y control de resets.
+
+RSS, working set y uso total del cgroup son señales distintas.
+La columna se llama \texttt{max\_rss\_mb}, mientras que la comunicación
+reciente usa MiB. Se conservan valores originales, sin convertir ni
+renombrar la unidad silenciosamente. La fórmula del recolector y su
+correspondencia con la cohorte deben cotejarse.

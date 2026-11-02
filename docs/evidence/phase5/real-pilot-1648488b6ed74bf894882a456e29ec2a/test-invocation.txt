@@ -1,0 +1,3 @@
+First return code: 0
+{"eligible_for_final_analysis":false,"experiment":"/tmp/phase5-real-pilot-ceuwrpbe/results/pilots/real-monitoring","samples":6557,"scenario_id":"ce02e3c45aeb8e6a95952cd3","status":"ok"}
+

@@ -1,0 +1,3 @@
+timestamp_epoch,engine,profile,query_id,concurrency,run_number,throughput_qps,latency_p50_ms,latency_p95_ms,latency_p99_ms,cpu_throttled_seconds,max_rss_mb,disk_spill,status
+1793585428.81335425,postgres,PROFILE_A_BASELINE,Q1,1,1,0.4166666666666666666666666667,2353.831192,2562.6225742,2800.77333032,0.083895,108.224512,1,spill
+1793591113.03612191,mongo,PROFILE_A_BASELINE,Q1,1,1,0.5466666666666666666666666667,1818.4072985,1861.30314085,1902.25359347,0,1026.650112,0,ok

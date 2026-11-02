@@ -1,0 +1,48 @@
+\section{Resultados consolidados}
+\subsection{Cobertura y procedencia}
+El responsable confirma dos mediciones elegibles Q1/A/C1/R1, una por
+motor. La cobertura y el cotejo local se distinguen.
+\input{\artifactdir/cobertura.tex}
+\input{\artifactdir/procedencia.tex}
+
+La asociación de CSV y commit por directorio no se presenta como
+verificación criptográfica cuando no se reconoce el hash correspondiente.
+
+\subsection{Valores originales}
+Las tablas conservan los decimales del CSV y no se corrigen para
+coincidir con un resumen redondeado.
+\input{\artifactdir/metricas.tex}
+Spill no cuantifica bytes o número de volcados. El throttling positivo
+es una señal de la ventana, no una explicación causal completa.
+
+\subsection{Resumen comunicado}
+\begin{table}[!htbp]\centering\small
+\caption{Cifras comunicadas y redondeadas; no son nuevas mediciones.}
+\begin{tabular}{lrr}\toprule
+Métrica & MongoDB & PostgreSQL\\\midrule
+QPS & 0.5467 & 0.4167\\
+P50 (ms) & 1818.41 & 2353.83\\
+P95 (ms) & 1861.30 & 2562.62\\
+P99 (ms) & 1902.25 & 2800.77\\
+RSS comunicado como MiB & 1026.65 & 108.22\\
+Throttling (s) & 0 & 0.083895\\
+Spill & 0 & 1\\
+Consultas completadas comunicadas & 164 & 125\\
+\bottomrule\end{tabular}
+\end{table}
+Los conteos se identifican como comunicados, sin deducirlos de QPS.
+La unidad RSS debe reconciliarse con el recolector.
+
+\subsection{Comparación descriptiva}
+\input{\artifactdir/comparacion.tex}
+Cada motor aporta una observación. Las operaciones comparten condiciones
+y no son réplicas independientes. No se presentan pruebas de significancia
+o intervalos no sustentados.
+
+\subsection{Pilotos y pendientes}
+Los pilotos de 15 segundos precedieron a los índices secundarios completos.
+Se mantienen como exploración de funcionamiento y telemetría.
+
+No se incorporan Q2, B/C ni C10/C50. Las otras 106 repeticiones no tienen
+resultado elegible comunicado en esta entrega. Pendiente, bloqueada e
+incompleta son estados distintos que requieren registros reales.

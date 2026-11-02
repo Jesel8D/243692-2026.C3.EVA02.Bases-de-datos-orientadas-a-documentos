@@ -1,0 +1,58 @@
+{
+  "status": "PASS",
+  "date_utc": "2026-11-01",
+  "unit_new": {
+    "discovered": 33,
+    "passed": 33
+  },
+  "regression": {
+    "discovered": 126,
+    "passed": 114,
+    "skipped": 12
+  },
+  "python_ast_files": 61,
+  "bash_syntax_files": 24,
+  "compose_profiles": [
+    "baseline",
+    "medium",
+    "severe"
+  ],
+  "promtool_configuration": "PASS",
+  "offline_reports": [
+    {
+      "directory": "reports/piloto-real/20261101T180841Z-1e2a201164",
+      "state": "DIAGNOSTIC_PARTIAL",
+      "files_hashed": 27,
+      "pdf_text_seven_sections": true,
+      "figures_png": 3
+    },
+    {
+      "directory": "reports/academico-parcial/20261101T180843Z-e7abcd9f5b",
+      "state": "PARTIAL",
+      "files_hashed": 8,
+      "pdf_text_seven_sections": true,
+      "figures_png": 0
+    }
+  ],
+  "previous_files_missing": [],
+  "previous_files_changed": [
+    "AGENTS.md",
+    "PLANS.md",
+    "README.md",
+    "docs/01-requisitos-y-trazabilidad.md",
+    "docs/04-arquitectura.md",
+    "docs/05-metricas-y-evidencia.md",
+    "docs/06-validacion-y-aceptacion.md",
+    "docs/07-decisiones-y-pendientes.md",
+    "docs/08-handoff.md",
+    "docs/12-automatizacion-benchmarks.md",
+    "docs/13-observabilidad-y-telemetria.md",
+    "query_tool.py"
+  ],
+  "csv_schema_unchanged": true,
+  "runner_unchanged": true,
+  "new_database_queries": 0,
+  "new_benchmarks": 0,
+  "definitive_measurements": 0,
+  "limits": "No physical Kubuntu/Mongo or massive/final experiment validation; prior real PG pilot analyzed offline only"
+}

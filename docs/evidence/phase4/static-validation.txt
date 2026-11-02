@@ -1,0 +1,11 @@
+Python compileall: PASS
+Bash -n scripts/*.sh tests/*.sh: PASS
+PASS Bash syntax
+PASS Compose profile baseline
+PASS Compose profile medium
+PASS Compose profile severe
+PASS variables requeridas, perfiles inválidos, recursos incompatibles, puertos loopback, imagen flotante y .env no ejecutable
+CLI base: 36 cells / 108 repetitions PASS
+CLI extended: 54 cells / 162 repetitions PASS
+No-argument, missing Q2 base selection and invalid profile rejected PASS
+Previous-phase backup comparison: 80 source files retained; only preexisting code changed queries/execution.py, documented native session bridge.

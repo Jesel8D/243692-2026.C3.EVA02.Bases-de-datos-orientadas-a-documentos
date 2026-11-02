@@ -1,0 +1,28 @@
+\section{Planes de ejecución}
+La evidencia prevista es \texttt{explain("executionStats")} y
+\texttt{EXPLAIN (ANALYZE, BUFFERS)}. Solo se utilizan artefactos existentes;
+no se ejecutan consultas para completarlos.
+\input{\artifactdir/planes.tex}
+
+\subsection{Escaneos y cardinalidades}
+Escaneo secuencial, índice y filtro representan trabajo distinto.
+Filas estimadas y reales, loops y cardinalidades intermedias aportan
+contexto. La existencia del índice no acredita su elección.
+
+En Q1 desanidar puede ampliar el flujo hacia filtro y agregación.
+El total de ítems no determina grupos ni costo del operador.
+En Q2 la selectividad condiciona el ordenamiento sin demostrar una
+ruta específica.
+
+\subsection{Agregación y buffers}
+En PostgreSQL, método de ordenamiento y bloques temporales describen el
+plan cuando están presentes. Buffers no son RSS y costos estimados no
+son tiempos observados \cite{pgexplain}. Ausencia de campo no significa cero.
+
+En MongoDB, documentos y claves examinados describen acceso. No se
+atribuyen etapas ausentes ni se trasladan campos entre versiones.
+
+\subsection{Límites de atribución}
+Un EXPLAIN adicional ejecuta su propio trabajo y no completa spill de
+otra ventana. El estado CSV no identifica operador ni tamaño temporal.
+Un plan Q1 no demuestra Q2 o uso del índice para el cast temporal.

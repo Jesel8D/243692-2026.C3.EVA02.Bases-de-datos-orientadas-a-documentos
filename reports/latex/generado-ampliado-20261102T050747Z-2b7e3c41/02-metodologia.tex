@@ -1,0 +1,117 @@
+\section{Metodología y baseline}
+\subsection{Preguntas de investigación M1/M2/M3}
+Las preguntas de lectura se refieren a rendimiento, recursos y
+comportamiento bajo concurrencia. La identificación normativa M1/M2/M3
+debe conservar la formulación de los playbooks. Los extractos reconocidos
+se presentan sin inventar una correspondencia.
+\input{\artifactdir/preguntas.tex}
+
+\subsection{Generación}
+El responsable confirma 500\,000 documentos, semilla 42 y
+1\,499\,443 ítems, aproximadamente tres por orden. La estructura incluye
+órdenes, clientes, ubicaciones, productos, pagos y metadatos.
+El desanidado produce una cardinalidad intermedia distinta del número
+de documentos.
+
+La semilla favorece repetibilidad, pero también importan generador y
+dependencias. Por ello se conservan manifiesto y hashes. Las distribuciones
+no se deducen de una descripción general.
+
+SHA-256 comunicado del JSONL:
+\begin{quote}\small
+\nolinkurl{9fecf656a02cf6d369517ae4d59f47072e4de4025ae9db6280611347fb557afb}
+\end{quote}
+Hash lógico comunicado:
+\begin{quote}\small
+\nolinkurl{3490c8c2b9a58f58ee69849dd55f00d556e64456168964d0cf74262e95cc7715}
+\end{quote}
+\input{\artifactdir/dataset.tex}
+
+\subsection{Carga y equivalencia}
+Se comunican 500\,000 documentos importados en cada motor y equivalencia
+lógica completa PASS. No implica igualdad binaria entre JSONL, BSON y
+JSONB ni igualdad de espacio físico.
+
+La igualdad de documentos no sustituye validar resultados de Q1/Q2.
+Tipos, fechas, orden y empates requieren los controles del proyecto.
+Importación y equivalencia son precondiciones, no resultados de rendimiento.
+
+\subsection{Índices y aceptación}
+MongoDB dispone, según el responsable, de \texttt{\_id} y de índices
+simples en \texttt{timestamp} y \texttt{order\_id}.
+PostgreSQL tiene PRIMARY KEY en \texttt{id} y B-Tree textual en
+\texttt{data\textgreater\textgreater{}'timestamp'}.
+
+Q2 convierte ese texto a \texttt{timestamptz}. Se distinguen:
+\begin{enumerate}
+\item existencia, definición y validez física;
+\item compatibilidad con el predicado;
+\item utilización efectiva en un plan;
+\item aprobación académica.
+\end{enumerate}
+La expresión consultada importa para un índice sobre expresiones
+\cite{pgindex}. La aceptación del responsable no demuestra uso,
+compatibilidad con el cast ni aprobación del profesor.
+La limitación permanece aunque las mediciones actuales sean Q1.
+
+\subsection{Consultas}
+Q1 desanida ítems, filtra \texttt{price > 50}, calcula subtotales y
+agrupa por país y categoría, produciendo sumatoria, promedio y conteo.
+Deben mantenerse expresiones y tipos originales.
+
+Q2 selecciona órdenes completadas en un rango temporal, ordena por
+importe final descendente y recupera Top-1000. No hay resultados
+definitivos Q2 incorporados.
+
+Los extractos proceden de archivos reales y se conservan fuentes completas.
+La selección automática no acredita por sí sola su invocación por el runner.
+\input{\artifactdir/consultas.tex}
+
+\subsection{Variantes, matriz y protocolo}
+La matriz base selecciona \texttt{allow\_disk\_false} y
+\texttt{work\_mem\_4mb}. Las variantes \texttt{allow\_disk\_true}
+y \texttt{work\_mem\_64mb} se mantienen separadas. No son presupuestos
+internos equivalentes de memoria.
+
+El diseño comprende:
+\[
+3\text{ perfiles}\times2\text{ motores}\times2\text{ consultas}
+\times3\text{ concurrencias}\times3\text{ repeticiones}=108.
+\]
+Las concurrencias son 1, 10 y 50. Una repetición por escenario comprende
+36 ejecuciones y no completa el protocolo.
+
+Se establecen 60 s de warmup, 300 s de medición y 60 s de cooldown.
+La duración total incluye preparación y controles: los 53 minutos y
+38 segundos comunicados para PostgreSQL no sustituyen la ventana ni
+se usan como denominador de QPS.
+
+Debe conservarse el criterio del runner sobre operaciones en los límites
+de ventana. No se reconstruye la latencia media desde la inversa de QPS
+ni se inventa conteo de operaciones.
+
+\subsection{Cachés y secuencia}
+El warmup no acredita estabilización. Caché del motor, caché del sistema
+operativo y conexiones son controles distintos. Un comando en un script
+no demuestra que se ejecutara en cada repetición.
+
+Este generador no limpia cachés, reinicia servicios ni ejecuta operaciones
+privilegiadas. Las condiciones deben cotejarse con evidencia existente.
+
+\subsection{Preflight e incidencia}
+El responsable confirma 135 pruebas automatizadas aprobadas para la
+optimización. La reutilización se bloqueó al cambiar de motor.
+Los casos probados y el intento de reutilización son evidencias distintas.
+
+No hay comparación temporal válida antes/después. No se afirma ahorro
+experimental. Se registra la incidencia sin modificar resultados
+comprometidos ni suprimir controles.
+
+\subsection{Contrato}
+La cabecera conserva 14 columnas:
+\begin{lstlisting}
+timestamp_epoch,engine,profile,query_id,concurrency,run_number,throughput_qps,latency_p50_ms,latency_p95_ms,latency_p99_ms,cpu_throttled_seconds,max_rss_mb,disk_spill,status
+\end{lstlisting}
+\texttt{spill} puede coexistir con elegibilidad. Las ausencias no se
+completan con cero. La confirmación del responsable se distingue del
+reconocimiento automático de campos en las evidencias.

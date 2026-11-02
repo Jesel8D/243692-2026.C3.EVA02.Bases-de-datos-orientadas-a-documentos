@@ -1,0 +1,9 @@
+6: 
+7: `benchmark_runner` llama a benchmark/cli.py; scripts/run_benchmarks.sh es la entrada Bash y reutiliza common.sh. matrix.py construye escenarios; config.py valida protocolo y hashes; preflight.py verifica datos/consultas/\xedndices; environment.py y scripts/benchmark_environment.sh reutilizan inicio/verificaci\xf3n de infraestructura; runner.py coordina workers.py y timing.py; metrics.py agrega; telemetry.py define proveedores; results.py escribe/manifiesta/reanuda/consolida; cache.py gestiona la constancia manual.
+8: 
+9: \xdanica adaptaci\xf3n de c\xf3digo preexistente: `QueryExecutor.open_session()` en queries/execution.py abre queries/native.py. No cambia execute(), SQL, pipelines, variantes ni validadores de Fase 3. El transporte anterior docker exec/mongosh/psql sirve para preflight y correcci\xf3n, pero crear\xeda procesos/conexiones por operaci\xf3n si se usara en la ventana medida. NativeSession mantiene conexiones reales con psycopg/PyMongo y reutiliza exactamente QuerySpec.sql/pipeline/options. La regresi\xf3n de Fases 2/3 y las pruebas nativas comprueban la adaptaci\xf3n. Generador, importadores, Compose, im\xe1genes, l\xedmites e \xedndices anteriores permanecen intactos.
+10: 
+22: 
+23: P-02 contin\xfaa OPEN: capacidad de planificar 162 no equivale a aprobaci\xf3n del cruce acad\xe9mico. S p.7 pide ambas variantes y P p.3 declara 108; el reporte deber\xe1 explicar el alcance autorizado. Orden actual determinista: motor, perfil, consulta, variante, concurrencia y repetici\xf3n seg\xfan el cat\xe1logo; no es balanceo aleatorio aprobado (P-08). Duraci\xf3n nominal 12h36 para 108 y 18h54 para 162, sin preflight/drenaje/cach\xe9/fallos.
+24: 
+28: 

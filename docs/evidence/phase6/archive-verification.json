@@ -1,0 +1,25 @@
+{
+  "archive": "fase6-reporte-kubuntu.zip",
+  "status": "PASS",
+  "files": 359,
+  "directories": 51,
+  "previous_files_preserved": 213,
+  "crc": "PASS",
+  "source_bytes": "PASS",
+  "paths_no_duplicates": "PASS",
+  "permissions_preserved": "PASS",
+  "original_pdfs_identical": "PASS",
+  "reports_only_real_pilot_or_empty_partial": "PASS",
+  "exclusions": [
+    "credentials",
+    ".env real",
+    "caches",
+    "volumes",
+    "massive datasets",
+    "test-generated outputs",
+    "temporary files",
+    "previous ZIPs"
+  ],
+  "sha256": "Stored externally in fase6-reporte-kubuntu.zip.sha256 to avoid self-reference",
+  "method": "Build/verify, record checks, rebuild and verify final archive including this record"
+}

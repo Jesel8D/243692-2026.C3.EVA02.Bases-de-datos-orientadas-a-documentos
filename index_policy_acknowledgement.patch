@@ -1,0 +1,176 @@
+--- a/benchmark/preflight.py
++++ b/benchmark/preflight.py
+@@ -33,6 +33,44 @@
+     return executor,result
+ 
+ 
++# Operator acknowledgement of a physical-index-only interpretation of the
++# main playbook. This does NOT assert compatibility with Q2's timestamptz cast
++# and does NOT represent approval by the course instructor.
++PG_INDEX_ACK_ENV = 'BENCHMARK_PG_TEXT_INDEX_ACK'
++PG_INDEX_ACK_EXACT = 'I_ACCEPT_PHYSICAL_TEXT_INDEX_ONLY_Q2_CAST_MISMATCH_NO_TEACHER_APPROVAL'
++
++
++def index_policy_decision(engine, audit, acknowledgement=None):
++    """Read-only gate: physical inventory plus explicit operator acknowledgement."""
++    if engine == 'mongo':
++        valid = audit.get('engine') == 'mongo' and audit.get('status') == 'PASS'
++        return {'status': 'PASS' if valid else 'BLOCKED',
++                'engine': engine, 'physical_index_ok': valid,
++                'basis': 'Mongo required indexes audited; no methodology exception'}
++    if engine != 'postgres':
++        raise QueryBlocked('Unsupported engine in index policy')
++    physical = (audit.get('engine') == 'postgres'
++                and audit.get('physical_index_status') == 'PASS'
++                and audit.get('primary_key_ok') is True
++                and audit.get('timestamp_text_index_present') is True
++                and audit.get('unexpected') == [] )
++    accepted = acknowledgement == PG_INDEX_ACK_EXACT
++    return {
++        'status': 'PASS' if physical and accepted else 'BLOCKED',
++        'engine': engine,
++        'physical_index_ok': physical,
++        'operator_acknowledged': accepted,
++        'operator_acknowledgement_source': PG_INDEX_ACK_ENV if accepted else None,
++        'operator_acknowledgement_text': PG_INDEX_ACK_EXACT if accepted else None,
++        'teacher_approval': 'not_asserted',
++        'original_q2_cast_matches_text_index': False,
++        'q2_index_usage_from_explain': 'not_verified_by_this_gate',
++        'reason': ('Physical B-Tree on data->>timestamp accepted by operator only; '
++                   'Q2 casts to timestamptz, so no assertion of predicate/index '
++                   'compatibility, index usage, or instructor approval'),
++    }
++
++
+ def preflight(scenario,protocol,dataset,output,resource_snapshot,telemetry):
+     if not Path('/sys/fs/cgroup/cgroup.controllers').exists() or docker('info','--format','{{.CgroupVersion}}')!='2':raise QueryBlocked('cgroups v2 required')
+     if shutil.disk_usage(output).free<256*1024*1024:raise QueryBlocked('Less than 256 MiB free; no runner starts')
+@@ -43,15 +81,30 @@
+     if not strict and stats['count']!=500000:deviations.append('small dataset, not definitive')
+     selected,result=inspect_identity(scenario.engine,scenario.query,scenario.variant,protocol.timeout_ms)
+     engines=['mongo','postgres'] if strict else [scenario.engine]
++    # Fail fast on index policy before repeating the expensive 500,000-row
++    # comparison. Inspect both engines in definitive mode, not merely the
++    # selected engine. Never replace the raw academic audit with a false PASS.
++    index_checks = {}
++    index_decisions = {}
++    index_acknowledgement = os.environ.get(PG_INDEX_ACK_ENV)
++    for e in engines:
++        ex = selected if e == scenario.engine else QueryExecutor(e,protocol.timeout_ms)
++        audit = inspect_indexes(ex)
++        decision = index_policy_decision(e, audit, index_acknowledgement)
++        index_checks[e] = audit
++        index_decisions[e] = decision
++        if strict and decision['status'] != 'PASS':
++            raise QueryBlocked('Index policy BLOCKED for ' + e +
++                               ': requires physically valid indexes and explicit '
++                               'operator acknowledgement for PostgreSQL text-index limitation')
++        if not strict and decision['status'] != 'PASS':
++            deviations.append('index conformity/interpretation pending; pilot only')
++    index_evidence = index_checks[scenario.engine]
+     adapters=[QueryExecutor(e,protocol.timeout_ms).adapter for e in engines]
+     data_evidence=compare_dataset(adapters,dataset)
+     reference=source_reference((doc for _,_,doc in iter_file(dataset)),scenario.query)
+     check=(validate_q1 if scenario.query=='Q1' else validate_q2)(reference,result['rows'],scenario.engine)
+     if check['status']!='PASS':raise QueryBlocked('Selected query failed independent source oracle')
+-    index_evidence=inspect_indexes(selected)
+-    if index_evidence['status']!='PASS':
+-        if strict:raise QueryBlocked('Index configuration/academic comparability not approved')
+-        deviations.append('index conformity pending; pilot only')
+     if strict:
+         # Check both original queries and every variant in both REAL engines, never old receipts alone.
+         for query in ('Q1','Q2'):
+@@ -59,7 +112,10 @@
+             from queries.definitions import VARIANTS
+             for e in engines:
+                 ex=QueryExecutor(e,protocol.timeout_ms)
+-                if inspect_indexes(ex)['status']!='PASS':raise QueryBlocked('Both index configurations must pass')
++                repeated_audit = inspect_indexes(ex)
++                repeated_policy = index_policy_decision(e, repeated_audit, index_acknowledgement)
++                if repeated_policy['status'] != 'PASS':
++                    raise QueryBlocked('Both real index policies must pass; failed: ' + e)
+                 for variant in VARIANTS[e][query]:
+                     answer=ex.execute(QuerySpec(e,query,variant,protocol.timeout_ms))
+                     c=(validate_q1 if query=='Q1' else validate_q2)(ref,answer['rows'],e)
+@@ -91,7 +147,12 @@
+     return {'dataset':{'sha256':stats['sha256'],'logical_sha256':stats['logical_sha256_in_file_order'],
+                          'count':stats['count'],'configuration':stats['configuration']},
+             'identity':identity,'resources_observed':resource_snapshot,'query_check':check,'data_check':data_evidence,
+-            'index_check':index_evidence,'telemetry_preflight':telemetry_check,'telemetry_capabilities':telemetry.capabilities(),'deviations':deviations}, NativeFactory(conn,reference,identity['server_version'])
++            'index_check':index_evidence,'index_checks_by_engine':index_checks,
++            'index_policy_by_engine':index_decisions,
++            'index_policy_scope':{'teacher_approval':'not_asserted',
++                                  'q2_text_index_cast_compatible':False,
++                                  'effective_interpretation':'operator-acknowledged physical-only when accepted'},
++            'telemetry_preflight':telemetry_check,'telemetry_capabilities':telemetry.capabilities(),'deviations':deviations}, NativeFactory(conn,reference,identity['server_version'])
+ 
+ 
+ def driver_versions():
+--- a/tests/test_index_policy_acceptance.py
++++ b/tests/test_index_policy_acceptance.py
+@@ -0,0 +1,65 @@
++"""Operator acknowledgement is not a substitute for a valid physical index."""
++import unittest
++from copy import deepcopy
++
++from queries.indexes import audit_postgres, audit_mongo
++from benchmark.preflight import index_policy_decision, PG_INDEX_ACK_EXACT
++
++
++def postgres_inventory():
++    return [
++        {'name': 'orders_pkey', 'access_method': 'btree', 'valid': True,
++         'ready': True, 'nkeys': 1, 'natts': 1, 'predicate': None,
++         'primary': True, 'unique': True, 'columns': ['id'],
++         'expression': None},
++        {'name': 'orders_timestamp_text_idx', 'access_method': 'btree',
++         'valid': True, 'ready': True, 'nkeys': 1, 'natts': 1,
++         'predicate': None, 'primary': False, 'unique': False,
++         'columns': None, 'expression': "(data ->> 'timestamp'::text)"},
++    ]
++
++
++class IndexPolicyTests(unittest.TestCase):
++    def test_original_postgres_audit_remains_academically_blocked(self):
++        audit = audit_postgres(postgres_inventory())
++        self.assertEqual(audit['physical_index_status'], 'PASS')
++        self.assertEqual(audit['status'], 'BLOCKED')
++
++    def test_requires_explicit_correct_acceptance(self):
++        audit = audit_postgres(postgres_inventory())
++        for ack in (None, '', 'yes', 'ACCEPT', PG_INDEX_ACK_EXACT + '!'):
++            self.assertEqual(index_policy_decision('postgres', audit, ack)['status'], 'BLOCKED')
++        accepted = index_policy_decision('postgres', audit, PG_INDEX_ACK_EXACT)
++        self.assertEqual(accepted['status'], 'PASS')
++        self.assertTrue(accepted['operator_acknowledged'])
++        self.assertFalse(accepted['original_q2_cast_matches_text_index'])
++        self.assertEqual(accepted['teacher_approval'], 'not_asserted')
++        self.assertEqual(accepted['q2_index_usage_from_explain'], 'not_verified_by_this_gate')
++
++    def test_bad_postgres_indexes_cannot_be_overridden(self):
++        rows = postgres_inventory()
++        cases = []
++        cases.append(rows[:1])                             # no timestamp index
++        cases.append(rows[1:])                             # no PK
++        extra = deepcopy(rows); extra.append(deepcopy(rows[1])); cases.append(extra)
++        invalid = deepcopy(rows); invalid[1]['valid'] = False; cases.append(invalid)
++        unready = deepcopy(rows); unready[1]['ready'] = False; cases.append(unready)
++        partial = deepcopy(rows); partial[1]['predicate'] = 'x'; cases.append(partial)
++        wrong_expr = deepcopy(rows); wrong_expr[1]['expression'] = "data->>'other'"; cases.append(wrong_expr)
++        wrong_am = deepcopy(rows); wrong_am[1]['access_method'] = 'hash'; cases.append(wrong_am)
++        for case in cases:
++            with self.subTest(case=case):
++                audit = audit_postgres(case)
++                self.assertEqual(audit['physical_index_status'], 'BLOCKED')
++                self.assertEqual(index_policy_decision('postgres', audit, PG_INDEX_ACK_EXACT)['status'], 'BLOCKED')
++
++    def test_mongodb_keeps_its_existing_strict_gate(self):
++        mongo = [{ 'key': {'_id': 1}}, {'key': {'timestamp': 1}}, {'key': {'order_id': 1}}]
++        good = audit_mongo(mongo)
++        self.assertEqual(index_policy_decision('mongo', good)['status'], 'PASS')
++        bad = audit_mongo(mongo[:1])
++        self.assertEqual(index_policy_decision('mongo', bad, PG_INDEX_ACK_EXACT)['status'], 'BLOCKED')
++
++
++if __name__ == '__main__':
++    unittest.main()

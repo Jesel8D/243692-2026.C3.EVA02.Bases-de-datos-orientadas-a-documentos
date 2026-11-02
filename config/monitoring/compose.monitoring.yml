@@ -1,0 +1,70 @@
+name: ${MONITORING_PROJECT_NAME:-jsonbench-monitoring}
+x-monitor: &monitor
+  platform: linux/amd64
+  restart: "no"
+  read_only: true
+  security_opt: [no-new-privileges:true]
+  cap_drop: [ALL]
+  networks: [monitoring]
+  logging:
+    driver: json-file
+    options: {max-size: 10m, max-file: "3"}
+services:
+  prometheus:
+    <<: *monitor
+    networks: [monitoring, host_access]
+    image: prom/prometheus:v3.15.1@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=${MONITORING_RETENTION:-7d}
+      - --storage.tsdb.retention.size=${MONITORING_RETENTION_SIZE:-0B}
+      - --web.listen-address=0.0.0.0:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports: ["127.0.0.1:${MONITORING_PORT:-19090}:9090"]
+    healthcheck:
+      test: [CMD, /bin/wget, -q, -O, /dev/null, http://127.0.0.1:9090/-/ready]
+      interval: 5s
+      timeout: 2s
+      retries: 12
+  cadvisor:
+    <<: *monitor
+    image: ghcr.io/google/cadvisor:0.60.6@sha256:b8e7d1093144fd088f425ff003d75a4aa405de075db78dae3bc563730b1bd07a
+    cgroup: host
+    command:
+      - --docker_only=true
+      - --housekeeping_interval=1s
+      - --max_housekeeping_interval=1s
+      - --allow_dynamic_housekeeping=false
+      - --store_container_labels=false
+      - --whitelisted_container_labels=com.docker.compose.project,com.docker.compose.service,academic.profile
+    volumes:
+      - /:/rootfs:ro,rslave
+      - /sys:/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /run/containerd/containerd.sock:/run/containerd/containerd.sock:ro
+      - ${MONITORING_DOCKER_ROOT:-/var/lib/docker}:/var/lib/docker:ro
+    tmpfs: [/tmp, /var/run]
+    # Distroless image has no shell/wget. Availability is checked by Prometheus targets and monitoring.sh health.
+  node-exporter:
+    <<: *monitor
+    image: prom/node-exporter:v1.12.1@sha256:1b4e4438faca4dd7e001dd445d161a4a2091b0fededa84093b3a8dfeae1f1be0
+    uts: host
+    command:
+      - --path.rootfs=/host/root
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+)($$|/)
+    volumes:
+      - /:/host/root:ro,rslave
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+networks:
+  monitoring:
+    internal: true
+  host_access:
+    driver: bridge
+volumes:
+  prometheus_data:

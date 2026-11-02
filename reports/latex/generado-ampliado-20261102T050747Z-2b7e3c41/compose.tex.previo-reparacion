@@ -1,0 +1,7 @@
+\begin{longtable}{p{0.30\linewidth}p{0.59\linewidth}}
+\toprule
+Servicio declarado & Imagen declarada \\
+\midrule\endhead
+mongodb & \$\{MONGO\_\allowbreak{}IMAGE:-\allowbreak{}mongo:9.\allowbreak{}0.\allowbreak{}4-\allowbreak{}resolute@sha256:714cc3db1e396e5a464b8443ccde50e53283368809401f53f1997b684ddb5be0\} \\
+postgres & \$\{POSTGRES\_\allowbreak{}IMAGE:-\allowbreak{}postgres:18.\allowbreak{}6-\allowbreak{}bookworm@sha256:5c4783a8cc3f0074912164f94dfa1be4e043438f0f707cf968d7af9a0d31a2c8\} \\
+\bottomrule\end{longtable}

@@ -1,0 +1,56 @@
+\section{Interpretación y amenazas a la validez}
+\subsection{Alcance}
+Q1/A/C1/R1 no permite generalizar a otros perfiles, concurrencias o
+consultas. Las operaciones comparten procesos y cachés, de modo que no
+reemplazan repeticiones independientes.
+
+Promediar percentiles no produce un percentil global. La inversa de QPS
+no sustituye necesariamente la latencia media, por los límites y
+criterios de contabilización.
+
+\subsection{CPU}
+PostgreSQL comunica 0.083895 segundos de throttling y MongoDB cero.
+La señal positiva no demuestra que CPU explique la diferencia temporal.
+Cero no excluye espera de E/S u otros cuellos de botella.
+
+La cuota define capacidad permitida y no uso constante. Sin B/C ni
+C10/C50 no se caracteriza respuesta a cuotas menores o saturación.
+
+\subsection{Memoria}
+RSS exige revisar alcance y unidades. No representa automáticamente toda
+la memoria atribuible: memoria compartida, procesos y caché del host
+pueden tener coberturas diferentes.
+
+PostgreSQL distingue buffers compartidos de memoria de operaciones.
+\texttt{work\_mem} no es un límite global y puede multiplicarse con
+sesiones y operaciones \cite{pgmemory}. WiredTiger mantiene caché propia
+e interactúa con la caché del sistema de archivos \cite{wiredtiger}.
+Estas explicaciones no atribuyen por sí solas el RSS de las ventanas.
+
+No se afirman tamaños internos sin configuración ni se suman señales
+heterogéneas para fabricar una memoria total.
+
+\subsection{Spill}
+Las políticas y planes diferentes son explicaciones posibles del spill,
+pero no demuestran causalidad. Se requiere evidencia del operador
+y de la ventana para cuantificar trabajo temporal.
+
+El permiso de disco de MongoDB condiciona etapas, sin obligarlas a
+derramar \cite{mongolimits}. No equivale a \texttt{work\_mem}.
+Las variantes se analizan separadamente.
+
+\subsection{Índices y semántica}
+La aceptación del responsable no transforma un índice textual en temporal.
+La elegibilidad Q1 no demuestra la ruta de Q2. La equivalencia lógica
+no obliga a estructuras internas iguales.
+
+\subsection{Amenazas}
+\begin{itemize}
+\item \textbf{Interna:} orden, cachés, carga, límites, ventanas y resets.
+\item \textbf{Constructo:} unidad RSS, spill, cálculo de QPS y errores.
+\item \textbf{Comparación:} variantes, índices, versiones y planes.
+\item \textbf{Externa:} un host, una semilla y dos consultas.
+\item \textbf{Conclusión:} una repetición por motor no estima variabilidad.
+\end{itemize}
+Las 135 pruebas del preflight no son medición de ahorro temporal.
+El bloqueo al cambiar de motor permanece como incidencia operativa.

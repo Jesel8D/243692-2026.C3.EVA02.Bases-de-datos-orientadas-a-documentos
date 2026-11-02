@@ -1,0 +1,23 @@
+test_controlled_expected_results_variants_and_plans (test_queries_integration.RealQueryTests.test_controlled_expected_results_variants_and_plans) ... ok
+test_empty_group_and_empty_topk (test_queries_integration.RealQueryTests.test_empty_group_and_empty_topk) ... ok
+test_generated_hundred (test_queries_integration.RealQueryTests.test_generated_hundred) ... ok
+test_generated_ten (test_queries_integration.RealQueryTests.test_generated_ten) ... ok
+test_generated_thousand (test_queries_integration.RealQueryTests.test_generated_thousand) ... ok
+test_indexes_inspect_safe_prepare_and_original_cast_incompatible (test_queries_integration.RealQueryTests.test_indexes_inspect_safe_prepare_and_original_cast_incompatible) ... ok
+test_invalid_calendar_blocks_before_workload (test_queries_integration.RealQueryTests.test_invalid_calendar_blocks_before_workload) ... ok
+test_top1000_boundary_ties (test_queries_integration.RealQueryTests.test_top1000_boundary_ties) ... ok
+test_totals_only_blocks_original_q2 (test_queries_integration.RealQueryTests.test_totals_only_blocks_original_q2) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 21.665s
+
+OK
+Real correctness database retained: phase3test_16f6495872f849c99782596bb46e60a1
+Real correctness database retained: phase3test_5b3936afa4f24d61a4823f238981098b
+Real correctness database retained: phase3test_89b9a7558ab549d1be6b357d36c8b27a
+Real correctness database retained: phase3test_6718a2eadcbe471f99329f4661c4075b
+Real correctness database retained: phase3test_9865972a13a8415784b57ecfd64af120
+Real correctness database retained: phase3test_cd0487842e6947f192399284fcc43907
+Real correctness database retained: phase3test_5e8cf832fc9b4f6ea279629e8987de2a
+Real correctness database retained: phase3test_61ad5ff11b09470eb7f3863ecee064e7
+Real correctness database retained: phase3test_aafc152d16f246abb3b476b5075f49fc

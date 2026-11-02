@@ -1,0 +1,28 @@
+{
+  "jsonbench-monitoring-cadvisor-1": {
+    "running": false,
+    "exit_code": 0,
+    "oom_killed": false,
+    "finished_at": "2026-11-01T16:57:31.546671868Z",
+    "stop_signal": ""
+  },
+  "jsonbench-monitoring-node-exporter-1": {
+    "running": false,
+    "exit_code": 2,
+    "oom_killed": false,
+    "finished_at": "2026-11-01T16:57:31.51468128Z",
+    "stop_signal": ""
+  },
+  "jsonbenchpgsmoke1793495-postgres-1": {
+    "running": false,
+    "exit_code": 0,
+    "oom_killed": false,
+    "finished_at": "2026-11-01T17:00:26.79501589Z",
+    "stop_signal": "SIGINT"
+  },
+  "notes": [
+    "monitoring.sh stop left PostgreSQL running; then only the initial PostgreSQL test container was restored stopped",
+    "Node Exporter final exit code 2 observed after stop; no OOM/error field; cause unconfirmed and requires local validation",
+    "Only owned temporary Prometheus PID stopped; TSDB outside backup retained"
+  ]
+}

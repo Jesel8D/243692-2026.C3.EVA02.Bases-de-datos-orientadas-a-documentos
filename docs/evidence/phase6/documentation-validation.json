@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "markdown_files": 28,
+  "local_links_checked": 141,
+  "errors": [],
+  "requirements_unique_contiguous": 95,
+  "decision_ids_unique_contiguous": 50,
+  "phases": 8,
+  "conflicts_trailing_whitespace_fences": "PASS",
+  "official_csv_and_runner_unchanged": true,
+  "manual_hashes": {
+    "docs/reference/playbook.pdf": "d3f7d23fb6fd18dc59916290063588f4c98b20649c2f230145fd353d50900ef6",
+    "docs/reference/playbook_sesion.pdf": "e8d8c2cfc6b5f3fd5f0fe5f4b613082c5174aefefc24d1f3316a4fe480a3cdcd"
+  },
+  "all_previous_files_preserved": true,
+  "previous_files_changed": [
+    "AGENTS.md",
+    "PLANS.md",
+    "README.md",
+    "docs/01-requisitos-y-trazabilidad.md",
+    "docs/04-arquitectura.md",
+    "docs/05-metricas-y-evidencia.md",
+    "docs/06-validacion-y-aceptacion.md",
+    "docs/07-decisiones-y-pendientes.md",
+    "docs/08-handoff.md",
+    "docs/12-automatizacion-benchmarks.md",
+    "docs/13-observabilidad-y-telemetria.md",
+    "query_tool.py"
+  ],
+  "git_diff_check": "Not applicable: no Git repository configured; standalone whitespace/conflict checks executed"
+}

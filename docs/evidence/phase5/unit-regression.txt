@@ -1,0 +1,107 @@
+test_base_and_extended_matrix_counts (test_benchmark.BenchmarkTests.test_base_and_extended_matrix_counts) ... ok
+test_boundary_classification (test_benchmark.BenchmarkTests.test_boundary_classification) ... ok
+test_cancellation_incomplete_and_connections_close (test_benchmark.BenchmarkTests.test_cancellation_incomplete_and_connections_close) ... ok
+test_concurrency_one_ten_fifty_no_reduction (test_benchmark.BenchmarkTests.test_concurrency_one_ten_fifty_no_reduction) ... ok
+test_connection_failure_no_fake_throughput (test_benchmark.BenchmarkTests.test_connection_failure_no_fake_throughput) ... ok
+test_consolidation_requires_sidecars_and_rejects_nonfinal (test_benchmark.BenchmarkTests.test_consolidation_requires_sidecars_and_rejects_nonfinal) ... ok
+test_corrupt_committed_csv_and_changed_dataset_rejected (test_benchmark.BenchmarkTests.test_corrupt_committed_csv_and_changed_dataset_rejected) ... ok
+test_csv_header_single_row_commit_resume_no_duplicate (test_benchmark.BenchmarkTests.test_csv_header_single_row_commit_resume_no_duplicate) ... ok
+test_direct_cgroup_delta_units_and_unknown_rss (test_benchmark.BenchmarkTests.test_direct_cgroup_delta_units_and_unknown_rss) ... ok
+test_exact_percentiles_type7 (test_benchmark.BenchmarkTests.test_exact_percentiles_type7) ... ok
+test_experiment_lock (test_benchmark.BenchmarkTests.test_experiment_lock) ... ok
+test_filters_ids_invalid_variants_and_protocol (test_benchmark.BenchmarkTests.test_filters_ids_invalid_variants_and_protocol) ... ok
+test_incomplete_corrupt_csv_preserved_new_attempt (test_benchmark.BenchmarkTests.test_incomplete_corrupt_csv_preserved_new_attempt) ... ok
+test_midwindow_cancel_not_finalized (test_benchmark.BenchmarkTests.test_midwindow_cancel_not_finalized) ... ok
+test_missing_telemetry_not_zero_or_ok (test_benchmark.BenchmarkTests.test_missing_telemetry_not_zero_or_ok) ... ok
+test_modes_never_mix_even_for_diagnostic_consolidation (test_benchmark.BenchmarkTests.test_modes_never_mix_even_for_diagnostic_consolidation) ... ok
+test_native_mongo_options_consumption_and_close_unit_only (test_benchmark.BenchmarkTests.test_native_mongo_options_consumption_and_close_unit_only) ... ok
+test_query_error_not_success_or_retry (test_benchmark.BenchmarkTests.test_query_error_not_success_or_retry) ... ok
+test_resume_rejects_protocol_sources_and_engine_changes (test_benchmark.BenchmarkTests.test_resume_rejects_protocol_sources_and_engine_changes) ... ok
+test_simulator_never_runs_as_pilot (test_benchmark.BenchmarkTests.test_simulator_never_runs_as_pilot) ... ok
+test_native_sessions_failures_pilot_csv_and_resume (test_benchmark_integration.NativePilotTests.test_native_sessions_failures_pilot_csv_and_resume) ... skipped 'explicit opt-in, native drivers and real PG required'
+test_bad_configs_and_no_overwrite (test_dataset.DatasetTests.test_bad_configs_and_no_overwrite) ... ok
+test_batch_bounds_and_missing_interface (test_dataset.DatasetTests.test_batch_bounds_and_missing_interface) ... ok
+test_cli_defaults_and_invalid_arguments (test_dataset.DatasetTests.test_cli_defaults_and_invalid_arguments) ... ok
+test_decimal_roundtrip_and_amounts (test_dataset.DatasetTests.test_decimal_roundtrip_and_amounts) ... ok
+test_deterministic_bytes_and_metadata_separation (test_dataset.DatasetTests.test_deterministic_bytes_and_metadata_separation) ... ok
+test_deterministic_sample_and_no_full_claim (test_dataset.DatasetTests.test_deterministic_sample_and_no_full_claim) ... unit-fake: verified=10/10
+ok
+test_duplicate_fields_nan_and_binary_double_rejected (test_dataset.DatasetTests.test_duplicate_fields_nan_and_binary_double_rejected) ... ok
+test_duplicate_uuid_detected_before_import (test_dataset.DatasetTests.test_duplicate_uuid_detected_before_import) ... ok
+test_half_up_tax_rule (test_dataset.DatasetTests.test_half_up_tax_rule) ... ok
+test_insert_only_resume_and_full_equivalence (test_dataset.DatasetTests.test_insert_only_resume_and_full_equivalence) ... unit-fake: verified=3/10
+unit-fake: verified=6/10
+unit-fake: verified=9/10
+unit-fake: verified=10/10
+unit-fake: verified=4/10
+unit-fake: verified=8/10
+unit-fake: verified=10/10
+ok
+test_mongo_decimal128_and_deterministic_technical_id (test_dataset.DatasetTests.test_mongo_decimal128_and_deterministic_technical_id) ... ok
+test_partial_batch_failure_can_resume_without_replace (test_dataset.DatasetTests.test_partial_batch_failure_can_resume_without_replace) ... unit-fake: verified=10/10
+ok
+test_postgres_copy_has_numeric_json_and_transaction (test_dataset.DatasetTests.test_postgres_copy_has_numeric_json_and_transaction) ... ok
+test_reversible_alias_layout (test_dataset.DatasetTests.test_reversible_alias_layout) ... ok
+test_schema_mutations_rejected (test_dataset.DatasetTests.test_schema_mutations_rejected) ... ok
+test_seed_changes_content_and_uuids (test_dataset.DatasetTests.test_seed_changes_content_and_uuids) ... ok
+test_streaming_memory_bound (test_dataset.DatasetTests.test_streaming_memory_bound) ... ok
+test_thousand_records_structure_distributions_and_uniqueness (test_dataset.DatasetTests.test_thousand_records_structure_distributions_and_uniqueness) ... ok
+test_validate_manifest_and_hash (test_dataset.DatasetTests.test_validate_manifest_and_hash) ... ok
+test_real_import_resume_and_readback (test_dataset_integration.RealDataIntegration.test_real_import_resume_and_readback) ... skipped 'requires explicit RUN_DATA_INTEGRATION=1 and running containers'
+test_cancel_restores_instrumentation (test_observability.ObservabilityTests.test_cancel_restores_instrumentation) ... ok
+test_clock_drift_invalidates_mapping (test_observability.ObservabilityTests.test_clock_drift_invalidates_mapping) ... ok
+test_counter_reset_is_unknown (test_observability.ObservabilityTests.test_counter_reset_is_unknown) ... ok
+test_exact_id_and_compose_labels (test_observability.ObservabilityTests.test_exact_id_and_compose_labels) ... ok
+test_http_error_and_empty_success (test_observability.ObservabilityTests.test_http_error_and_empty_success) ... ok
+test_mongo_external_profiling_change_not_overwritten (test_observability.ObservabilityTests.test_mongo_external_profiling_change_not_overwritten) ... ok
+test_mongo_profile_true_false_and_insufficient (test_observability.ObservabilityTests.test_mongo_profile_true_false_and_insufficient) ... ok
+test_mongo_profiling_bounded_filter_and_restore (test_observability.ObservabilityTests.test_mongo_profiling_bounded_filter_and_restore) ... ok
+test_monitoring_config_no_eval_or_public_url (test_observability.ObservabilityTests.test_monitoring_config_no_eval_or_public_url) ... ok
+test_no_samples_gaps_and_missing_boundary (test_observability.ObservabilityTests.test_no_samples_gaps_and_missing_boundary) ... ok
+test_nonfinite_metric_and_duplicate_timestamps (test_observability.ObservabilityTests.test_nonfinite_metric_and_duplicate_timestamps) ... ok
+test_observed_counter_delta_and_valid_zero (test_observability.ObservabilityTests.test_observed_counter_delta_and_valid_zero) ... ok
+test_oom_confirmed_no_exit137_inference (test_observability.ObservabilityTests.test_oom_confirmed_no_exit137_inference) ... ok
+test_outside_window_oom_not_assigned (test_observability.ObservabilityTests.test_outside_window_oom_not_assigned) ... ok
+test_pg_absence_requires_complete_valid_mechanism (test_observability.ObservabilityTests.test_pg_absence_requires_complete_valid_mechanism) ... ok
+test_pg_global_or_warmup_files_not_attributed (test_observability.ObservabilityTests.test_pg_global_or_warmup_files_not_attributed) ... ok
+test_pg_log_extracts_only_tempfile_evidence (test_observability.ObservabilityTests.test_pg_log_extracts_only_tempfile_evidence) ... ok
+test_pg_positive_is_attributed_to_measured_backend_and_query (test_observability.ObservabilityTests.test_pg_positive_is_attributed_to_measured_backend_and_query) ... ok
+test_promql_uses_exact_label_and_valid_metric (test_observability.ObservabilityTests.test_promql_uses_exact_label_and_valid_metric) ... ok
+test_rfc3339_nanoseconds_exact (test_observability.ObservabilityTests.test_rfc3339_nanoseconds_exact) ... ok
+test_rss_decimal_mb_not_working_set (test_observability.ObservabilityTests.test_rss_decimal_mb_not_working_set) ... ok
+test_runner_lifecycle_csv_evidence_and_resume (test_observability.ObservabilityTests.test_runner_lifecycle_csv_evidence_and_resume) ... ok
+test_targets_down_stale_and_wrong_interval (test_observability.ObservabilityTests.test_targets_down_stale_and_wrong_interval) ... ok
+test_unparsed_engine_log_never_means_no_spill (test_observability.ObservabilityTests.test_unparsed_engine_log_never_means_no_spill) ... ok
+test_wrong_profile_or_project_rejected (test_observability.ObservabilityTests.test_wrong_profile_or_project_rejected) ... ok
+test_real_scraping_native_pilot_and_resume (test_observability_integration.RealMonitoringTests.test_real_scraping_native_pilot_and_resume) ... skipped 'requires explicit opt-in, real exporters/Prometheus and PostgreSQL'
+test_aggregate_option_not_pipeline_stage (test_queries.QueryTests.test_aggregate_option_not_pipeline_stage) ... ok
+test_average_policy_allows_only_engine_quantization (test_queries.QueryTests.test_average_policy_allows_only_engine_quantization) ... ok
+test_dates_states_and_topk_small (test_queries.QueryTests.test_dates_states_and_topk_small) ... ok
+test_empty_groups (test_queries.QueryTests.test_empty_groups) ... ok
+test_invalid_oracle_and_failure_are_json_serializable (test_queries.QueryTests.test_invalid_oracle_and_failure_are_json_serializable) ... ok
+test_invalid_specs (test_queries.QueryTests.test_invalid_specs) ... ok
+test_missing_alias_inconsistent_alias_and_timestamps_blocked (test_queries.QueryTests.test_missing_alias_inconsistent_alias_and_timestamps_blocked) ... ok
+test_missing_real_engine_results_are_blocked (test_queries.QueryTests.test_missing_real_engine_results_are_blocked) ... ok
+test_mongo_index_audit (test_queries.QueryTests.test_mongo_index_audit) ... ok
+test_original_pipeline_shapes_and_options (test_queries.QueryTests.test_original_pipeline_shapes_and_options) ... ok
+test_plan_missing_metrics_stay_none_and_zero_stays_zero (test_queries.QueryTests.test_plan_missing_metrics_stay_none_and_zero_stays_zero) ... ok
+test_q1_detects_total_count_keys_float_and_strings (test_queries.QueryTests.test_q1_detects_total_count_keys_float_and_strings) ... ok
+test_q1_hand_computed_groups_counts_and_filter (test_queries.QueryTests.test_q1_hand_computed_groups_counts_and_filter) ... ok
+test_sql_structure_and_no_secondary_sort (test_queries.QueryTests.test_sql_structure_and_no_secondary_sort) ... ok
+test_top1000_legitimate_different_boundary_subsets (test_queries.QueryTests.test_top1000_legitimate_different_boundary_subsets) ... ok
+test_workmem_and_timeout_local_in_same_session (test_queries.QueryTests.test_workmem_and_timeout_local_in_same_session) ... ok
+test_wrong_topk_missing_high_duplicate_and_order_fail (test_queries.QueryTests.test_wrong_topk_missing_high_duplicate_and_order_fail) ... ok
+test_controlled_expected_results_variants_and_plans (test_queries_integration.RealQueryTests.test_controlled_expected_results_variants_and_plans) ... skipped 'requires explicit opt-in and real running containers'
+test_empty_group_and_empty_topk (test_queries_integration.RealQueryTests.test_empty_group_and_empty_topk) ... skipped 'requires explicit opt-in and real running containers'
+test_generated_hundred (test_queries_integration.RealQueryTests.test_generated_hundred) ... skipped 'requires explicit opt-in and real running containers'
+test_generated_ten (test_queries_integration.RealQueryTests.test_generated_ten) ... skipped 'requires explicit opt-in and real running containers'
+test_generated_thousand (test_queries_integration.RealQueryTests.test_generated_thousand) ... skipped 'requires explicit opt-in and real running containers'
+test_indexes_inspect_safe_prepare_and_original_cast_incompatible (test_queries_integration.RealQueryTests.test_indexes_inspect_safe_prepare_and_original_cast_incompatible) ... skipped 'requires explicit opt-in and real running containers'
+test_invalid_calendar_blocks_before_workload (test_queries_integration.RealQueryTests.test_invalid_calendar_blocks_before_workload) ... skipped 'requires explicit opt-in and real running containers'
+test_top1000_boundary_ties (test_queries_integration.RealQueryTests.test_top1000_boundary_ties) ... skipped 'requires explicit opt-in and real running containers'
+test_totals_only_blocks_original_q2 (test_queries_integration.RealQueryTests.test_totals_only_blocks_original_q2) ... skipped 'requires explicit opt-in and real running containers'
+
+----------------------------------------------------------------------
+Ran 93 tests in 7.353s
+
+OK (skipped=12)

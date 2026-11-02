@@ -1,0 +1,9 @@
+8: 
+9: ## Organizaci\xf3n e interfaz reutilizable
+10: 
+13: - queries/variants.json y definitions.py: combinaciones v\xe1lidas y QuerySpec inmutable.
+14: - queries/execution.py: QueryExecutor, preflight de tipos/fechas/alias, sesiones y timeouts.
+15: - queries/validation.py: referencia independiente desde fuente y validadores de resultados.
+19: 
+20: Se reutilizan los adaptadores stdlib de Fase 2 y el socket Docker local. Mongo utiliza la API de colecci\xf3n de mongosh (`aggregate(pipeline, options)`); no se a\xf1ade PyMongo, framework ni servicio. PostgreSQL usa psql. Son backends de correcci\xf3n: procesos de cliente, preflight y serializaci\xf3n no son una base v\xe1lida para medir latencia de motor. Un runner futuro podr\xe1 reutilizar definiciones, variantes, or\xe1culos y normalizaci\xf3n, sustituyendo el transporte por sesiones persistentes si se aprueba. No hay runner implementado.
+21: 

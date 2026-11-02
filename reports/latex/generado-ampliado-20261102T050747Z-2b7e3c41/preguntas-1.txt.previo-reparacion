@@ -1,0 +1,8 @@
+ 1. Preguntas sobre las m\xe9tricas
+M1 \xbeC\xf3mo cambian la latencia P95 y P99 de las agregaciones sobre documentos anidados cuando se
+    limita de forma estricta la CPU y la memoria?
+M2 \xbeQu\xe9 motor usa de forma m\xe1s e
+ciente los buers de ordenamiento y agrupamiento antes de volcar
+    a disco temporal o fallar por falta de memoria (OOM)?
+M3 \xbeCu\xe1l es la huella de CPU y memoria por cada 1 000 documentos procesados en el motor documental
+    frente al motor con JSONB?

@@ -1,0 +1,257 @@
+                         Medición de métricas en bases documentales
+
+                         MongoDB frente a PostgreSQL JSONB bajo contención
+
+                             Ingeniería en Tecnologías de la Información e Innovación Digital
+
+                                                         IT2iD
+                                       Universidad Politécnica de Chiapas · IT2iD
+
+                                                         2026
+
+
+
+
+IT2iD   |   Universidad Politécnica de Chiapas · IT2iD | 2026                                   1/13
+                                                                           Recorrido de la sesión
+
+
+
+
+Pregunta guía
+
+¾Qué hay que medir, cómo se ejecuta y qué evidencia entregar para que un estudio posterior (y
+un revisor) puedan reproducir y cuestionar el resultado?
+
+                       Qué                  Cómo                Ejemplo        Qué
+                      medimos              se corre             de celda     entregar
+
+Al salir
+
+Entender la matriz Mongo/Postgres × perles × Q1/Q2 × concurrencia, y el CSV/reporte que
+alimenta un estudio.
+
+
+
+
+IT2iD   |   Universidad Politécnica de Chiapas · IT2iD | 2026                                  2/13
+                                                                Qué van a hacer (en una frase)
+
+
+
+Actividad
+
+Comparar      MongoDB (documentos) y PostgreSQL JSONB al ejecutar agregaciones JSON
+anidadas, con límites estrictos de CPU y memoria (Docker cgroups v2).
+
+
+   Dataset: 500 000 órdenes con ∼3 niveles de anidamiento.
+   Dos cargas: Q1 (unwind + group) y Q2 (sort + Top-K ).
+   Tres perles: baseline / media / severa.
+   Tres concurrencias: 1, 10, 50.
+
+
+No es probar si arranca
+
+Cada corrida produce        métricas numeradas (latencia, QPS, throttling, RSS, spill, OOM) en un
+CSV homogéneo.
+
+
+
+
+IT2iD   |   Universidad Politécnica de Chiapas · IT2iD | 2026                                 3/13
+                                                         Preguntas que responden las métricas
+
+
+
+
+M1 ¾Cómo cambian P95/P99 al limitar CPU y memoria?
+M2 ¾Qué motor gestiona mejor buers antes de spill o OOM?
+M3 ¾Cuál es la huella de CPU/memoria por cada 1 000 documentos?
+
+  Para el equipo                                            Para el estudio
+
+  Guían qué celdas priorizar y qué contraste                Son las mismas preguntas que un revisor
+  reportar.                                                 pedirá justicar con datos.
+
+
+
+
+IT2iD   |   Universidad Politécnica de Chiapas · IT2iD | 2026                                         4/13
+                                                       Perles de recursos (ejemplo operativo)
+
+
+
+
+Qué anotar siempre
+
+profile, límites Docker reales, versión del motor y si hubo spill/OOM. Sin eso, la celda no
+sirve para el estudio.
+
+
+
+
+IT2iD   |   Universidad Politécnica de Chiapas · IT2iD | 2026                                 5/13
+                                                                 Ejemplo Q1: saturación de CPU
+
+
+
+
+Desanidar items, ltrar price > 50, agrupar por país y categoría.
+ MongoDB (idea)                                             PostgreSQL (idea)
+
+ $unwind items                                              jsonb_array_elements
+ $match price > 50                                           + WHERE price > 50
+ $group by country ,                                         + GROUP BY country ,
+          category                                                      category
+
+
+Métrica a mirar
+Throughput y P95/P99; en severa, tiempo CFS throttled.
+
+
+
+
+IT2iD   |   Universidad Politécnica de Chiapas · IT2iD | 2026                               6/13
+                                                         Ejemplo Q2: estrés de buer (Top-K )
+
+
+
+
+Filtrar completadas, ordenar por final_total, Top-1000.
+   Mongo: allowDiskUse false/true.
+   Postgres: work_mem 4 MB / 64 MB.
+
+Ejemplo de lectura (cticio, formato)
+
+Perl C, concurrencia 50, allowDiskUse:false ⇒ spill o fallo.
+Misma celda con disco permitido ⇒ termina, pero baja QPS.
+
+Para el revisor
+Hay que reportar ambas variantes: sin spill y con spill (o OOM).
+
+
+
+
+IT2iD   |   Universidad Politécnica de Chiapas · IT2iD | 2026                              7/13
+                                            Una celda de la matriz (qué es una medición)
+
+
+
+
+                                    Motor      Perl     Query   Concurrencia
+
+
+
+
+                                          × 3 repeticiones
+
+
+   Matriz: 2 × 3 × 2 × 3 = 36 celdas; cada una × 3 repeticiones.
+   Ciclo: ush caché → warmup 60 s → medición 300 s → cooldown 60 s.
+
+
+Producto mínimo por celda
+
+Una la CSV por repetición + nota de estado (ok/spill/oom/error).
+
+
+
+
+IT2iD   |   Universidad Politécnica de Chiapas · IT2iD | 2026                           8/13
+                                                                  Ejemplo de la CSV (formato esperado)
+
+
+
+
+Sin columnas inventadas ni renombradas: el estudio posterior concatena todos los CSV.
+
+
+
+
+IT2iD   |   Universidad Politécnica de Chiapas · IT2iD | 2026                                        9/13
+                                                                                    Qué van a entregar
+
+
+
+
+Código / scripts                                                Evidencia
+
+   docker-compose parametrizado                                   CSV con el esquema jo
+
+   generador 500k                                                 Capturas o logs de spill/OOM
+
+   runner (k6 o Python)                                           Reporte de métricas (7 secciones del
+
+   queries/ Mongo + SQL                                           playbook)
+
+   run_benchmarks.sh
+
+Criterio de utilidad
+
+Si otro equipo no puede reejecutar o un revisor no puede cuestionar P99/throttling con sus
+datos, la entrega está incompleta.
+
+
+
+
+IT2iD   |   Universidad Politécnica de Chiapas · IT2iD | 2026                                            10/13
+                                                       Qué preguntará un revisor (anticípense)
+
+
+
+
+1. ¾El baseline es comparable (mismo dataset, mismas queries)?
+
+2. ¾Las latencias son P50/P95/P99 o solo promedios?
+
+3. ¾Hubo throttling CFS? ¾Cuántos segundos?
+
+4. ¾Spill a disco o OOM? ¾En qué perl y concurrencia?
+
+5. ¾Cuántas repeticiones y cómo se resume (media / mediana)?
+
+6. ¾El plan de ejecución respalda el cuello de botella?
+
+
+Su reporte debe contestarlas con tablas/guras
+
+No con opiniones: con las del CSV y un plan explain / EXPLAIN           ANALYZE.
+
+
+
+
+IT2iD   |   Universidad Politécnica de Chiapas · IT2iD | 2026                              11/13
+                                                                Secciones del reporte (checklist)
+
+
+
+
+Puente
+
+El PDF playbook.pdf es la especicación; estas diapos jan el contrato de entrega.
+
+
+
+
+IT2iD   |   Universidad Politécnica de Chiapas · IT2iD | 2026                                 12/13
+                                                                                   Cierre
+
+
+
+
+   Miden bajo contención, no solo en máquina libre.
+   Cada celda → las CSV + estado + (si aplica) spill/OOM.
+   El entregable alimenta un estudio y resiste preguntas de revisor.
+
+
+Siguiente paso en laboratorio
+
+Levantar perles A/B/C, correr una celda piloto (1 motor × 1 query × 1 concurrencia) y
+validar el CSV antes de la matriz completa.
+
+
+
+
+IT2iD   |   Universidad Politécnica de Chiapas · IT2iD | 2026                            13/13
+

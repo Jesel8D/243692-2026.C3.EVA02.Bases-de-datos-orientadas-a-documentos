@@ -1,0 +1,52 @@
+.env
+.env.*
+!.env.example
+*.secret
+*.key
+__pycache__/
+.pytest_cache/
+*.pyc
+*.log
+.local/
+credentials/
+data/
+results/
+*.zip
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Credenciales
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa
+id_ed25519
+
+# Dataset masivo: reproducible mediante generador y manifiesto
+/data/*.jsonl
+/data/*.jsonl.gz
+
+# Respaldos y archivos temporales
+*.zip
+*.tar
+*.tgz
+*.bak-*
+*.respaldo-*
+/respaldo-docker-anterior/
+/reports/latex-backups/
+/reports/latex-respaldo-*/
+/reports/latex/generado-ampliado-*/build/
+
+# Temporales de LaTeX
+*.aux
+*.toc
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz

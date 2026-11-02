@@ -1,0 +1,6 @@
+# Native benchmark sessions; verified in an isolated Python 3.12 venv on 2026-11-01.
+# Explicit direct and transitive versions; engine images remain unchanged.
+psycopg[binary]==3.3.6
+pymongo==4.19.0
+dnspython==2.9.1
+typing_extensions==4.16.0

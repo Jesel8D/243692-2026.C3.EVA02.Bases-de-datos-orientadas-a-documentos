@@ -1,0 +1,19 @@
+\section{Análisis gráfico}
+Las figuras usan valores leídos de los CSV admitidos. No completan
+escenarios ni introducen ajustes o intervalos ficticios.
+\reportfigure{comparacion.pdf}
+{Throughput y percentiles individuales Q1/A/C1/R1. No son promedios
+entre repeticiones.}{fig:comparacion}
+P50, P95 y P99 son resúmenes de una ventana, no tres réplicas.
+\reportfigure{p99.pdf}
+{P99 frente a concurrencia. Solo C=1 tiene observaciones.}{fig:p99}
+\reportfigure{throttling.pdf}
+{Throttling frente a QPS. Dos puntos no sustentan una relación causal.}
+{fig:throttling}
+\reportfigure{rss.pdf}
+{RSS máximo original. No se convierte MB a MiB sin cotejar el recolector.}
+{fig:rss}
+Un máximo no reconstruye evolución temporal. Las series se incluyen solo
+si existen muestras e identidad suficiente. Su intervalo no se equipara
+automáticamente con la ventana de medición.
+\input{\artifactdir/series.tex}

@@ -1,0 +1,14 @@
+services:
+  mongodb:
+    networks: [database, host_access]
+    ports:
+      - "127.0.0.1:${MONGO_PORT:-27017}:27017"
+
+  postgres:
+    networks: [database, host_access]
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+
+networks:
+  host_access:
+    driver: bridge
